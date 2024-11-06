@@ -1,8 +1,10 @@
 from sqlmodel import Relationship , ForeignKey , DateTime, SQLModel, Field, Column, Integer, String, Boolean
+
+from app.models.types.loginForm import LoginForm
 from .base_model import DbBaseModel
 from datetime import datetime
-
-
+from sqlmodel import Session , select
+from typing import Optional
 class User(DbBaseModel, table=True):
     __tablename__ = "users"
     id: int = Field(
@@ -75,3 +77,5 @@ class Roll(DbBaseModel, table=True):
     description: str = Field(sa_column=Column(String))
     is_active: bool = Field(sa_column=Column(Boolean, default=True))
     # is active for these roll or not
+
+    

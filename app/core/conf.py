@@ -25,7 +25,7 @@ class Settings(BaseSettings):
     
     
     model_config = SettingsConfigDict(
-        env_file="../.env",
+        env_file=".env",
         env_ignore_empty=True,
         extra="ignore",
     )
@@ -33,7 +33,7 @@ class Settings(BaseSettings):
     @property
     def DATABASE_URL(self):
         if self.DATABASE_TYPE == DatabaseTypes.sqlite:
-            return f"sqlite:///{self.DATABASE_URL}"
+            return self.DATABASE_NAME
         return f"{self.DATABASE_TYPE}://{self.DATABASE_USERNAME}:{self.DATABASE_PASSWORD}@{self.DATABASE_HOST}:{self.DATABASE_PORT}/{self.DATABASE_NAME}"
 
 
