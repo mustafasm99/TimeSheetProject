@@ -40,7 +40,12 @@ class UsersRoll(SQLModel, table=True):
               ForeignKey("users.id", ondelete="CASCADE"), 
           ),
      )
-    roll_id: int = Field(sa_column=Column(Integer))
+    roll_id: int = Field(
+        sa_column=Column(
+            Integer,
+            ForeignKey("roll.id", ondelete="CASCADE"),
+        )
+    )
     is_active: bool = Field(sa_column=Column(Boolean, default=True))
     user: "User" = Relationship(
          back_populates="users_roll"
