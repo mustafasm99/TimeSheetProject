@@ -67,7 +67,14 @@ class Project(SQLModel, table=True):
                ForeignKey("users.id", ondelete="CASCADE"),
             ),
      )
-    team: "Team" = Relationship(back_populates="projects") 
+    project_status_id: int = Field(
+        sa_column=Column(
+            Integer,
+            ForeignKey("project_status.id", ondelete="CASCADE"),
+        ),
+    )
+    team: "Team" = Relationship(back_populates="projects")
+    project_status: "Project_Status" = Relationship(back_populates="projects")
 
 
 class Team(SQLModel , table=True):
@@ -107,5 +114,48 @@ class Team(SQLModel , table=True):
           )
      )
      members_counter: int = Field(sa_column=Column(Integer , default=0))
-     project: "Project" = Relationship(back_populates="team")
-     
+     projects: list["Project"] = Relationship(back_populates="team")
+
+
+class Project_Status(SQLModel , table=True):
+    __tablename__ = "project_status"
+    id: int = Field(
+        sa_column=Column(
+            Integer,
+            primary_key=True,
+            index=True,
+            autoincrement=True,
+        ),
+    )
+    title: str = Field(
+        sa_column=Column(
+            String,
+            nullable=False,
+        ),
+    )
+    description: str = Field(
+        sa_column=Column(
+            String,
+            nullable=False,
+        ),
+    )
+    is_active: bool = Field(
+        sa_column=Column(
+            Boolean,
+            default=True,
+        ),
+    )
+    create_time: datetime = Field(
+        sa_column=Column(
+            DateTime,
+            default=datetime.utcnow,
+        )
+    )
+    update_time: datetime = Field(
+        sa_column=Column(
+            DateTime,
+            default=datetime.utcnow,
+            onupdate=datetime.utcnow,
+        )
+    )
+    projects: "Project" = Relationship(back_populates="project_status")

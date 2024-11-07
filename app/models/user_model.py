@@ -1,6 +1,5 @@
 from sqlmodel import Relationship , ForeignKey , DateTime, SQLModel, Field, Column, Integer, String, Boolean
-
-from app.models.types.loginForm import LoginForm
+from app.models.types.auth_types import LoginForm
 from .base_model import DbBaseModel
 from datetime import datetime
 from sqlmodel import Session , select
@@ -16,7 +15,7 @@ class User(DbBaseModel, table=True):
     is_active: bool = Field(sa_column=Column(Boolean, default=True))
     is_superuser: bool = Field(sa_column=Column(Boolean, default=False))
     is_temp_password: bool = Field(sa_column=Column(Boolean, default=False))
-    users_roll:"UsersRoll" = Relationship(back_populates="user")
+    users_roll:list["UsersRoll"] = Relationship(back_populates="user")
 
 class UsersRoll(SQLModel, table=True):
     __tablename__ = "users_roll"
@@ -39,17 +38,24 @@ class UsersRoll(SQLModel, table=True):
     user_id: int = Field(
          sa_column=Column(
               Integer,
-              ForeignKey("users.id", ondelete="CASCADE"), 
+              ForeignKey("users.id", ondelete="CASCADE"),
+              index=True, 
           ),
      )
     roll_id: int = Field(
         sa_column=Column(
             Integer,
-            ForeignKey("roll.id", ondelete="CASCADE"),
+            ForeignKey(
+                "roll.id",
+                ondelete="CASCADE",
+            ),
         )
     )
     is_active: bool = Field(sa_column=Column(Boolean, default=True))
     user: "User" = Relationship(
+         back_populates="users_roll"
+    )
+    roll: "Roll" = Relationship(
          back_populates="users_roll"
     )
     # is active for these user or not
@@ -71,11 +77,13 @@ class Roll(DbBaseModel, table=True):
             DateTime,
             default=datetime.utcnow,
             onupdate=datetime.utcnow,
+            nullable=True,
         )
     )
     name: str = Field(sa_column=Column(String, index=True))
     description: str = Field(sa_column=Column(String))
     is_active: bool = Field(sa_column=Column(Boolean, default=True))
+    users_roll:list["UsersRoll"] = Relationship(back_populates="roll")
     # is active for these roll or not
 
     

@@ -9,3 +9,8 @@ class BaseResponse(BaseModel, Generic[T]):
     data: Optional[T]
 
 
+class TokenResponse(BaseModel):
+    access_token: str
+    token_type: str
+
+
