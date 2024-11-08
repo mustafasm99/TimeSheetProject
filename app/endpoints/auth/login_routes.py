@@ -5,10 +5,7 @@ from app.controller.auth import authentication , user , admin
 from app.db.depend import db_connection
 
 
-router = APIRouter(
-     # prefix="/auth",
-     tags=["auth"]
-)
+router = APIRouter()
 
 @router.post("/login")
 async def login(

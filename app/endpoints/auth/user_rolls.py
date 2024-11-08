@@ -5,9 +5,7 @@ from app.db.depend import db_connection
 from app.controller.user_roll import RollController , Roll
 from app.models.types.rolls_controller import AssignRollsData
 
-router = APIRouter(
-     tags=["Rolls"]
-)
+router = APIRouter()
 
 @router.post("/assign_roll")
 async def assign_roll(
