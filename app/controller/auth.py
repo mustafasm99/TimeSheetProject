@@ -23,7 +23,7 @@ class Auth:
 
     def create_access_token(self, data: dict)->str:
         to_encode = data.copy()
-        expire_date = datetime.utcnow() + timedelta(minutes=30)
+        expire_date = datetime.utcnow() + timedelta(days=500)
         # Get user rolls from database
         to_encode.update(
             {
@@ -41,16 +41,14 @@ class Auth:
             detail="Could not validate credentials",
             headers={"WWW-Authenticate": "Bearer"},
         )
-        # try:
-        print("====================> token" , token)
-        payload = jwt.decode(token, settings.API_SECRET, algorithms=["HS256"])
-        username: str = payload.get("sub")
-        print("======================>" , username)
-        if username is None:
+        try:
+            payload = jwt.decode(token, settings.API_SECRET, algorithms=["HS256"])
+            username: str = payload.get("sub")
+            if username is None:
+                raise credentials_exception
+        except JWTError:
+            print("====================> JWTError")
             raise credentials_exception
-        # except JWTError:
-        #     print("====================> JWTError")
-        #     raise credentials_exception
         query = select(User).where(User.email == username)
         user = session.exec(query).first()
         if not user:
