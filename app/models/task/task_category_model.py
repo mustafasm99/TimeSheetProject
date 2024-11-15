@@ -34,4 +34,4 @@ class TaskCategory(SQLModel , table = True):
      )
      category: str = Field(sa_column=Column(String, index=True))
      is_active: bool = Field(sa_column=Column(Boolean, default=True))
-     task: "Task" = Relationship(back_populates="task_category")
+     task: list["Task"] = Relationship(back_populates="task_category")
