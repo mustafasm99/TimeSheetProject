@@ -49,4 +49,4 @@ class TaskUpdate(SQLModel, table=True):
     )
     is_active: bool = Field(sa_column=Column(Boolean, default=True))
     task: "Task" = Relationship(back_populates="task_update")
-    user: "User" = Relationship(back_populates="user_update")
+    user: "User" = Relationship(back_populates="task_update")

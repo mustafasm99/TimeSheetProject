@@ -1,6 +1,7 @@
 from sqlmodel import (
 #     ForeignKey,
     Boolean,
+    Relationship,
     String,
     DateTime,
     Field,
@@ -10,6 +11,8 @@ from sqlmodel import (
 #     Relationship,
 )
 from datetime import datetime
+
+from app.models.task.task_counter_model import TaskCounter
 
 class TaskCounterType(SQLModel , table = True):
      __tablename__ = "task_counter_type"
@@ -31,3 +34,4 @@ class TaskCounterType(SQLModel , table = True):
           )
      counter_type: str = Field(sa_column=Column(String, index=True))
      is_active: bool = Field(sa_column=Column(Boolean, default=True))
+     task_counter: "TaskCounter" = Relationship(back_populates="counter_type")
