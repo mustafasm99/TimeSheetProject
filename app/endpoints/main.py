@@ -13,6 +13,9 @@ from .tasks.task_category_router import task_category_router
 from .tasks.task_comments_routes import task_comment_router
 from .tasks.task_counter_router import task_counter_router
 from .tasks.task_counter_type import task_counter_type_router
+from .users.users_endpoint import user_router
+from .profile.profile_router import profile_router
+
 router = APIRouter()
 
 router.include_router(login_router, prefix="/auth", tags=["Auth"])
@@ -29,3 +32,5 @@ router.include_router(task_category_router.router)
 router.include_router(task_comment_router.router)
 router.include_router(task_counter_router.router)
 router.include_router(task_counter_type_router.router)
+router.include_router(user_router.router)
+router.include_router(profile_router.router)

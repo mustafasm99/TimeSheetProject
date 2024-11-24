@@ -14,7 +14,28 @@ from app.models.task.task_status_model import TaskStatus
 from app.models.task.task_category_model import TaskCategory
 from app.models.task.task_counter_model import TaskCounter
 from app.models.task.task_counter_type_model import TaskCounterType
+from app.models.profile import Profile
 from alembic import context
+
+__all__ = [
+    "SQLModel",
+    "User",
+    "UsersRoll",
+    "Roll",
+    "Project",
+    "Team",
+    "Task",
+    "TaskAssignee",
+    "TaskAccountable",
+    "TaskUpdate",
+    "TaskComment",
+    "TaskStatus",
+    "TaskCategory",
+    "TaskCounter",
+    "TaskCounterType",
+    "Profile",
+]
+
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

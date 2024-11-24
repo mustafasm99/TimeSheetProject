@@ -22,13 +22,15 @@ class Settings(BaseSettings):
     DATABASE_PORT: str|None = None
     DATABASE_NAME: str|None = None
     
-    
+    MAX_IMAGE_SIZE:int = 1024 * 1024 * 5
     
     model_config = SettingsConfigDict(
         env_file=".env",
         env_ignore_empty=True,
         extra="ignore",
     )
+
+    MEDIA_PATH: str = "media"
 
     @property
     def DATABASE_URL(self):

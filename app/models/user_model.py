@@ -4,10 +4,9 @@ from app.models.task.task_assignee_model import TaskAssignee
 from app.models.task.task_coments_model import TaskComment
 from .base_model import DbBaseModel
 from datetime import datetime
-from sqlmodel import Session , select
-from typing import Optional
 from app.models.task.task_update_model import TaskUpdate
 from app.models.task.task_accountable_model import TaskAccountable
+from app.models.profile import Profile
 class User(DbBaseModel, table=True):
     __tablename__ = "users"
     id: int = Field(
@@ -19,12 +18,14 @@ class User(DbBaseModel, table=True):
     is_active: bool = Field(sa_column=Column(Boolean, default=True))
     is_superuser: bool = Field(sa_column=Column(Boolean, default=False))
     is_temp_password: bool = Field(sa_column=Column(Boolean, default=False))
+    
+    # Relationships
     users_roll:list["UsersRoll"] = Relationship(back_populates="user")
     task_update:list["TaskUpdate"] = Relationship(back_populates="user")
     user_accountable:list["TaskAccountable"] = Relationship(back_populates="user")
     user_assign:list["TaskAssignee"] = Relationship(back_populates="user")
     user_comment:list["TaskComment"] = Relationship(back_populates="user")
-
+    profile: "Profile" = Relationship(back_populates="user")
 
 class UsersRoll(SQLModel, table=True):
     __tablename__ = "users_roll"
