@@ -3,46 +3,52 @@ import { Task, TaskType } from "@/types/tasks";
 import { useState } from "react";
 import { z } from "zod";
 import Line from "../util/line";
-import { useQuery , useQueryClient} from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { selectOption, MultiSelect } from "../util/multi_select";
 import { GetMyTeams } from "@/server/projects/teams";
 import config from "@/settings/configer";
 import { GetTaskStatus } from "@/server/tasks/task_status";
 import ThumpUserHolder from "../util/thump_user_holder";
 import { profileMe } from "@/types/profile_type";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-export default function CreateTaskForm()  {
+export default function CreateTaskForm() {
   const token = localStorage.getItem("token") as string;
   // get all  teams members
   const { data, error, isLoading } = useQuery({
     queryKey: ["my_teams"],
-    queryFn:()  => GetMyTeams(token),
+    queryFn: () => GetMyTeams(token),
   });
   // get all task statuses
-  const { data:statusData, error:statusError, isLoading:statusLoading } = useQuery({
+  const {
+    data: statusData,
+    error: statusError,
+    isLoading: statusLoading,
+  } = useQuery({
     queryKey: ["task_status"],
-    queryFn:()  => GetTaskStatus(token),
+    queryFn: () => GetTaskStatus(token),
   });
 
   const current_profile = useQueryClient().getQueryData<profileMe>(["profile"]);
 
-
   const apiUrl = config().API_URL;
-  const options:selectOption[] = data?.members // Extract values from the object
-    .map((member) => {
+  const options: selectOption[] =
+    data?.members // Extract values from the object
+      .map((member) => {
+        return {
+          label: member.name,
+          value: member.id,
+          img: apiUrl + member.profile_image,
+        };
+      }) || [];
+
+  const taskStatus: selectOption[] =
+    statusData?.map((status) => {
       return {
-        label: member.name,
-        value: member.id,
-        img: apiUrl+member.profile_image,
+        label: status.status,
+        value: status.id,
       };
     }) || [];
-  
-  const taskStatus:selectOption[] = statusData?.map((status) => {
-    return {
-      label: status.status,
-      value: status.id,
-    };
-  }) || [] ;
 
   const [task, setTask] = useState<TaskType>({
     task_title: "",
@@ -54,11 +60,13 @@ export default function CreateTaskForm()  {
     project: "",
   });
   const [value, setValue] = useState<selectOption[]>([]);
-  const [statusValue, setStatusValue] = useState<selectOption|undefined>(undefined);
+  const [statusValue, setStatusValue] = useState<selectOption | undefined>(
+    undefined
+  );
   return (
     <div className="absolute border-2 border-white right-0 flex flex-col justify-start bg-mainColor p-3 h-full w-1/3">
       <form action="" method="post">
-        <div className="flex flex-col">
+        <div className="flex flex-col gap-5">
           <label htmlFor="title">Task Title</label>
           <div className="flex flex-row justify-between gap-3">
             <input
@@ -74,21 +82,7 @@ export default function CreateTaskForm()  {
               <option value="low">Low</option>
             </select>
           </div>
-          <Line />
-          <div className="flex flex-row">
-            <label htmlFor="description" className="w-full">
-              Task Description :{" "}
-            </label>
-            <textarea
-              name="description"
-              className="p-2 rounded-md text-fontColor mx-2 w-full"
-              value={task.task_description}
-              onChange={(e) =>
-                setTask({ ...task, task_description: e.target.value })
-              }
-            ></textarea>
-          </div>
-          <Line />
+
           <div className="flex flex-row justify-start align-center items-center w-full">
             <label
               htmlFor="assignee"
@@ -107,25 +101,24 @@ export default function CreateTaskForm()  {
                 onChange={(o) => setValue(o)}
               />
             )}
-
           </div>
-           <Line></Line> 
+          <Line></Line>
           <div className="flex flex-row w-full items-center">
             <label htmlFor="Dou Date" className=" w-[fit-content]">
               Due Date:
             </label>
-              <input
-                className="p-2 rounded-md text-fontColor mx-2 flex-1 w-full"
-                type="date"
-                name="due_date"
-                value={task.due_date.toISOString().split("T")[0]}
-                onChange={(e) =>
-                  setTask({
-                    ...task,
-                    due_date: new Date(e.target.value),
-                  })
-                }
-              />
+            <input
+              className="p-2 rounded-md text-fontColor mx-2 flex-1 w-full"
+              type="date"
+              name="due_date"
+              value={task.due_date.toISOString().split("T")[0]}
+              onChange={(e) =>
+                setTask({
+                  ...task,
+                  due_date: new Date(e.target.value),
+                })
+              }
+            />
           </div>
           <div className="flex flex-row justify-start align-center items-center w-full my-10">
             <label
@@ -145,16 +138,41 @@ export default function CreateTaskForm()  {
                 onChange={(o) => setStatusValue(o)}
               />
             )}
-
           </div>
           <div className="my-10 flex flex-row w-full items-center">
             <label htmlFor="">Created By :</label>
-            <ThumpUserHolder 
+            <ThumpUserHolder
               img={current_profile?.profile_image}
               name={current_profile?.user?.name || ""}
               dark={true}
-             />
-          </div> 
+            />
+          </div>
+          <Tabs defaultValue="description" className="w-[95%]">
+            <TabsList className="bg-transparent flex flex-row justify-between items-center border-b-2 border-black rounded-none">
+              <TabsTrigger
+                value="description"
+                className="bg-transparent"
+              >
+                Description
+              </TabsTrigger>
+              <TabsTrigger value="Activities">Activities</TabsTrigger>
+              <TabsTrigger value="comments">Comments</TabsTrigger>
+            </TabsList>
+            <TabsContent value="description">
+              <textarea
+                name="description"
+                className="p-2 rounded-md text-fontColor w-full"
+                value={task.task_description}
+                onChange={(e) =>
+                  setTask({ ...task, task_description: e.target.value })
+                }
+              ></textarea>
+            </TabsContent>
+          </Tabs>
+
+          <button type="submit" className="px-5 py-2 bg-hoverColor rounded-md w-[fit-content] mx-auto">
+            <span>Create Task</span>
+          </button>
         </div>
       </form>
     </div>
