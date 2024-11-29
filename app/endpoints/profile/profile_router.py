@@ -18,6 +18,20 @@ class CreateProfile(BaseModel):
     user_id: int
     bio: str
 
+class UserData(BaseModel):
+    name:str
+    email:str
+    is_superuser:bool
+    is_active:bool
+    
+
+class ProfileData(BaseModel):
+    bio:str
+    user_id:int
+    id:int
+    profile_image:str
+    user:UserData
+
 
 class ProfileRouter(BaseRouter[Profile, CreateProfile]):
     def __init__(self):
@@ -35,7 +49,7 @@ class ProfileRouter(BaseRouter[Profile, CreateProfile]):
             methods=["GET"],
             path="/me",
             endpoint=self.profileMe,
-            response_model=Profile,
+            response_model=ProfileData,
         )
         self.router.add_api_route(
                methods=["POST"],
@@ -69,8 +83,11 @@ class ProfileRouter(BaseRouter[Profile, CreateProfile]):
             raise HTTPException(status_code=400, detail="Update failed")
         return result
 
-    async def profileMe(self, user: User = Depends(authentication.get_current_user)):
-        return await self.get_one(user.id)
+    async def profileMe(self, user: User = Depends(authentication.get_current_user))->ProfileData:
+        profile = await self.get_one(user.id)
+        if not profile:
+            raise HTTPException(status_code=404, detail="Profile not found")
+        return ProfileData(**profile.dict(), user=UserData(**user.model_dump()))
     
     async def upload_profile_image(
          self,

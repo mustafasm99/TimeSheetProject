@@ -10,8 +10,12 @@ export default {
   theme: {
   	extend: {
   		colors: {
+			mainColor : 'var(--widget-background-color)',
+			fontColor: 'var(--widget-font-color)',
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
+			BorderColor:'var(--border-color)',
+			hoverColor : 'var(--hover-color)',
   			card: {
   				DEFAULT: 'hsl(var(--card))',
   				foreground: 'hsl(var(--card-foreground))'

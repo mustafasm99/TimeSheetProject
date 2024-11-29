@@ -18,7 +18,7 @@ class User(DbBaseModel, table=True):
     is_active: bool = Field(sa_column=Column(Boolean, default=True))
     is_superuser: bool = Field(sa_column=Column(Boolean, default=False))
     is_temp_password: bool = Field(sa_column=Column(Boolean, default=False))
-    
+    team_id: int = Field(sa_column=Column(Integer, ForeignKey("teams.id", ondelete="CASCADE"), nullable=True))
     # Relationships
     users_roll:list["UsersRoll"] = Relationship(back_populates="user")
     task_update:list["TaskUpdate"] = Relationship(back_populates="user")

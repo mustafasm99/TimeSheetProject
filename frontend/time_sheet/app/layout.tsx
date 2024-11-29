@@ -13,6 +13,7 @@ import { Search } from "lucide-react";
 
 import { useState } from "react";
 import ProfileHolder from "@/components/profile-holder/profile-holder";
+import CreateTaskForm from "@/components/tasks/create_tasks";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -66,42 +67,47 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
     <>
       <TanstackProvider>
         <Toaster position="bottom-left" />
-        <SidebarProvider>
-          <AppSidebar />
-          <main className="w-full bg-">
-            <SidebarTrigger />
-            <div className="flex flex-col flex-1 w-full">
-              <div className="flex flex-row justify-end w-full align-baseline items-center">
-                <div className="container search-holder w-full h-20 mx-5 rounded-md">
-                  <div className="h-full relative">
-                    {!isSearching && (
-                      <Search className="h-10 w-full absolute translate-y-1/2 -translate-x-20" />
-                    )}
-                    <Input
-                      onInput={(e) => {
-                        setSearch(e.currentTarget.value);
-                        setIsSearching(true);
-                      }}
-                      placeholder="Search"
-                      style={{
-                        width: "100%",
-                        border: "none",
-                        backgroundColor: "transparent",
-                        height: "100%",
-                        textAlign: "center",
-                        fontSize: "1.5rem",
-                      }}
-                    />
+        {token == null ? (
+          children
+        ) : (
+          <SidebarProvider>
+            <AppSidebar />
+            <main className="w-full bg-">
+              <SidebarTrigger />
+              <div className="flex flex-col flex-1 w-full px-2">
+                <div className="flex flex-row justify-between w-full align-baseline items-center">
+                  <div className="container search-holder w-full h-20 mx-5 rounded-md">
+                    <div className="h-full relative">
+                      {!isSearching && (
+                        <Search className="h-10 w-full absolute translate-y-1/2 -translate-x-20" />
+                      )}
+                      <Input
+                        onInput={(e) => {
+                          setSearch(e.currentTarget.value);
+                          setIsSearching(true);
+                        }}
+                        placeholder="Search"
+                        style={{
+                          width: "100%",
+                          border: "none",
+                          backgroundColor: "transparent",
+                          height: "100%",
+                          textAlign: "center",
+                          fontSize: "1.5rem",
+                        }}
+                      />
+                    </div>
+                  </div>
+                  <div className="container w-4/12">
+                    <ProfileHolder />
                   </div>
                 </div>
-                <div className="container w-4/12">
-                  <ProfileHolder />
-                </div>
+                  {children}
+                  <CreateTaskForm />
               </div>
-              {children}
-            </div>
-          </main>
-        </SidebarProvider>
+            </main>
+          </SidebarProvider>
+        )}
       </TanstackProvider>
     </>
   );

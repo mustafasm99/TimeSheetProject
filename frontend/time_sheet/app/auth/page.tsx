@@ -16,7 +16,7 @@ export default function Login() {
     },
     onSuccess: (data) => {
       toast.success("Successfully logged in");
-      console.log(data);
+      
     },
   });
 
@@ -24,7 +24,6 @@ export default function Login() {
   var [password, setPassword] = useState("");
 
   const {token} = useAppContext();
-  console.log(token);
   return (
     <div className="h-full center text-slate-300 max-w-sm mx-auto flex flex-col place-items-center justify-center my-auto">
       <h1 className="center font-bold text-2xl">Login</h1>
@@ -33,7 +32,7 @@ export default function Login() {
           onSubmit={async (e) => {
                e.preventDefault();
                await mutate({ username: username, password: password });
-               // window.location.href = "/";
+               window.location.href = "/";
           }}
           action=""
           method="post"

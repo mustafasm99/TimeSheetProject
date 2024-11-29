@@ -1,3 +1,4 @@
+from app.controller.task_controllers.task_controller import TaskController
 from app.models.task.task_model import Task
 from app.endpoints.base.base_router import BaseRouter
 from app.controller.base_controller import BaseController
@@ -21,12 +22,21 @@ class TaskRouter(BaseRouter[Task, CreateTask]):
      def __init__(self):
           super().__init__(
                tag=["Task"],
-               controller=BaseController(Task),
+               controller=TaskController(),
                model=Task,
                create_type=CreateTask,
                prefix="/task",
                auth_object=[Depends(authentication.get_current_user)],
           )
+     
+     def setup_routes(self):
+          self.router.add_api_route(
+               methods=["GET"],
+               path="/me",
+               endpoint=self.task_me,
+               response_model=list[Task],
+          )
+          super().setup_routes()
      
      async def create(self, data: CreateTask = Body(...)):
           result = await super().create(data=data)
@@ -41,6 +51,13 @@ class TaskRouter(BaseRouter[Task, CreateTask]):
           logging.info(f"Update result: {result}")
           if not result:
                raise HTTPException(status_code=400, detail="Update failed")
+          return result
+     
+     async def task_me(self , user = Depends(authentication.get_current_user)):
+          result = self.controller.get_user_tasks(user_id = user.id)
+          logging.info(f"Task result: {result}")
+          if not result:
+               raise HTTPException(status_code=404, detail="No tasks found")
           return result
 
 task_router = TaskRouter()

@@ -1,6 +1,7 @@
 import { GetMyProfile } from "@/server/profile/get_me";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+
+import { Bell } from "lucide-react";
 
 export default function ProfileHolder() {
   const { data, error, isLoading } = useQuery({
@@ -8,7 +9,7 @@ export default function ProfileHolder() {
     queryFn: () => GetMyProfile(localStorage.getItem("token") as string),
   });
   return (
-    <div className="container p-2">
+    <div className="container p-3 flex-grow bg-mainColor rounded-lg">
       {isLoading && (
         <div role="status">
           <svg
@@ -31,13 +32,41 @@ export default function ProfileHolder() {
         </div>
       )}
       {data && (
-          <div className="container flex flex-row justify-end items-center -mx-5">
-               <img
-               src={data.profile_image}
-               alt="profile image"
-               className="w-20 h-20 rounded-full content-center object-cover"
-               />
+        <div className="flex flex-row justify">
+          <div className="text-bold text-center text-white flex flex-col flex-1 w-[fit-content]">
+            <h1>{data.user.name}</h1>
+
+            <p>no current task</p>
           </div>
+
+          <button className="mx-4 my-2 ">
+            <Bell className="w-6 h-6 text-white" />
+          </button>
+
+
+          {/* the image here  */}
+          <div className="relative group">
+            <img
+              src={data.profile_image}
+              alt="profile image"
+              className="w-[50px] h-[50px] rounded-full content-center object-cover"
+            />
+            <div className="absolute -bottom-10 -left-10">
+              <ul className="bg-white text-mainColor p-5 rounded-lg hover:bg-mainColor hover:text-white border-2 border-blue-400 transition-all duration-300 ease-linear hidden group-hover:block">
+                <li>
+                  <button
+                    className="bg-transparent border-none"
+                    onClick={() => {}}
+                  >
+                    Logout
+                  </button>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          
+        </div>
       )}
     </div>
   );

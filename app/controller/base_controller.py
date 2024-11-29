@@ -24,7 +24,6 @@ class BaseController(Generic[T]):
             return False
 
     async def create(self, data: T) -> bool | T:
-        print(data)
         try:
             self.session.add(data)
             self.session.commit()

@@ -8,6 +8,7 @@ from pydantic import BaseModel
 from abc import abstractmethod
 from app.models.user_model import User
 
+
 _ModelType = TypeVar("_ModelType", bound=SQLModel)
 _CreateType = TypeVar("_CreateType", bound=BaseModel)
 
