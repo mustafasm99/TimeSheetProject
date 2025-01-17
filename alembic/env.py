@@ -4,7 +4,7 @@ from sqlmodel import SQLModel
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
 from app.models.user_model import User , UsersRoll , Roll
-from app.models.project_model import Project , Team
+from app.models.project_model import Project , Team , Team_Member
 from app.models.task.task_model import Task
 from app.models.task.task_assignee_model import TaskAssignee
 from app.models.task.task_accountable_model import TaskAccountable
@@ -19,6 +19,7 @@ from alembic import context
 
 __all__ = [
     "SQLModel",
+    "Team_Member",
     "User",
     "UsersRoll",
     "Roll",

@@ -1,5 +1,4 @@
-from app.models.profile import Profile
-from app.models.project_model import Team, Project
+from app.models.project_model import Team, Project , Team_Member
 from app.endpoints.base.base_router import BaseRouter
 from app.controller.base_controller import BaseController
 from pydantic import BaseModel
@@ -9,7 +8,7 @@ from app.controller.auth import authentication
 from fastapi import Depends
 from sqlmodel import select
 from app.models.user_model import User
-from app.endpoints.profile.profile_router import profile_router 
+
 
 
 class CreateTeam(BaseModel):
@@ -21,7 +20,7 @@ class CreateTeam(BaseModel):
 class teamMember(BaseModel):
     id:int
     name:str
-    bio:str
+    bio:str|None
     profile_image:str|None
     
 
@@ -52,7 +51,7 @@ class TeamRouter(BaseRouter[Team, CreateTeam]):
             methods=["GET"],
             path="/my_teams",
             endpoint=self.my_teams,
-            response_model=myTeam,
+            response_model=myTeam|None,
         )
         super().setup_routes()
         self.router.add_api_route(
@@ -65,8 +64,12 @@ class TeamRouter(BaseRouter[Team, CreateTeam]):
     async def get_team_members(
         self, id: int, user: User = Depends(authentication.get_current_user)
     ):
-        query = select(User).where(User.team_id == id)
-        return list[User](self.controller.session.exec(query).all())
+        team:Team = await self.get_one(id=id)
+        print(team.team_members[0].user.profile , "team -------------->")
+        return [
+            member.user
+            for member in team.team_members
+        ]
 
     async def create(self, data: CreateTeam = Body(...)):
         result = await super().create(data=data)
@@ -84,20 +87,22 @@ class TeamRouter(BaseRouter[Team, CreateTeam]):
 
     async def my_teams(
         self, user: User = Depends(authentication.get_current_user)
-    ) -> myTeam:
-        query = select(Team).where(Team.id == user.team_id)
+    ) -> myTeam|None:
+        query = select(Team).where(Team.id == user.team_members[-1].team_id)
         result = self.controller.session.exec(query).first()
+        if not result:
+            return None
         return myTeam(
             team_id=result.id,
             name=result.name,
             description=result.description,
-            team_leader_id=result.team_leader_id,
+            team_leader_id=list(filter(lambda member: member.is_leader, result.team_members))[0].id,
             members=[
                 teamMember(
                     id=user.id,
                     name=user.name,
-                    bio=user.profile.bio,
-                    profile_image=f"/profile/me/image?id={user.profile.id}",
+                    bio=user.profile.bio if user.profile else None,
+                    profile_image=f"/profile/me/image?id={user.profile.id}" if user.profile else None,
                 )
                 for user in await self.get_team_members(id=result.id)
                 ],

@@ -15,6 +15,7 @@ from .tasks.task_counter_router import task_counter_router
 from .tasks.task_counter_type import task_counter_type_router
 from .users.users_endpoint import user_router
 from .profile.profile_router import profile_router
+from .project.team_members_routers import teamMembersRouter
 
 router = APIRouter()
 
@@ -23,6 +24,7 @@ router.include_router(user_rolls_router, prefix="/roll", tags=["Roll"])
 router.include_router(project_status_router.router)
 router.include_router(project_router.router)
 router.include_router(team_router.router)
+router.include_router(teamMembersRouter.router)
 router.include_router(task_router.router)
 router.include_router(task_status_router.router)
 router.include_router(task_update_router.router)

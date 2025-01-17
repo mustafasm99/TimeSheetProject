@@ -1,18 +1,19 @@
 import {z} from 'zod';
 
 export const TaskAssignee = z.object({
-     assignee_names: z.array(z.string()).nullish(),
+     assignee: z.array(z.number()).nullish(),
 })
 
 
 export const Task = z.object({
-     task_title: z.string(),
-     task_description: z.string(),
-     assignee: TaskAssignee,
-     due_date: z.date(),
-     status: z.string(),
-     priority: z.string(),
-     project: z.string(),
+     title: z.string(),
+     description: z.string(),
+     assignee: z.array(z.number()),
+     start_time: z.date(),
+     end_time: z.date(),
+     status_id: z.number(),
+     category_id: z.number(),
+     project_id: z.number(),
 })
 
 export type TaskType = z.infer<typeof Task>

@@ -6,6 +6,8 @@ from fastapi import Body, HTTPException
 import logging
 from app.controller.auth import authentication
 from fastapi import Depends
+from app.models.user_model import User
+
 
 class CreateProject(BaseModel):
     title: str
@@ -29,6 +31,24 @@ class ProjectRouter(BaseRouter[Project, CreateProject]):
                prefix="/project",
                auth_object=[Depends(authentication.get_current_user)],
           )
+     
+     def setup_routes(self):
+          self.router.add_api_route(
+               path="/my_projects",
+               endpoint=self.get_my_projects,
+               methods=["GET"],
+               tags=["Project"],
+               summary="Get my projects",
+               response_description="List of projects",
+          )
+          super().setup_routes()
+     
+     async def get_my_projects(self , user:User = Depends(authentication.get_current_user))->list[Project]|None:
+          projects:list[Project|None] = []
+          for team in user.team_members:
+               for project in team.team.projects:
+                    projects.append(project)
+          return projects
      
      async def create(self, data: CreateProject = Body(...)):
           result = await super().create(data=data)

@@ -65,9 +65,10 @@ class Auth:
     def login(self, data: LoginForm, session: Session) -> str|None:
         query = select(User).where(User.email == data.username)
         user = session.exec(query).first()
-
+        
         if user and self.verify_password(
-            plain_password=data.password, hashed_password=user.password
+            plain_password=data.password,
+            hashed_password=user.password
         ):
           token = self.create_access_token({
                "sub":user.email,

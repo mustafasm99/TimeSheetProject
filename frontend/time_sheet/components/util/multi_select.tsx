@@ -86,7 +86,7 @@ export  function MultiSelect({ multiple, option, value, onChange , title }: sele
         </div>
         {open && <div className={"bg-mainColor w-full max-h-[320px] rounded-md p-3 border-2 border-white" } >
           <div 
-          className={"flex flex-col gap-3"}
+          className={"flex flex-row gap-1 flex-wrap justify-start items-start"}
           >
             {option.map((opt, index) => (
               <div

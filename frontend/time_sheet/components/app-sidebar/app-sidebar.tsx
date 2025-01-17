@@ -125,7 +125,7 @@ export default function AppSidebar() {
                  :
                 (
                 <a href="/" className="block py-2 px-4" onClick={()=>{
-                  localStorage.removeItem("token");
+                  localStorage.clear();
                 }}>
                     Logout
                 </a>

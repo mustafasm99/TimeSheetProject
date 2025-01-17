@@ -2,12 +2,14 @@
 
 import { loginUser } from "@/server/auth/users";
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { NextResponse } from "next/server";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { useAppContext } from "@/context/index";
+import { useRouter } from "next/navigation"
+
 
 export default function Login() {
+  const router = useRouter();
   const { mutate, isError, isSuccess } = useMutation({
     mutationFn: loginUser,
     onError: (error) => {
@@ -16,7 +18,7 @@ export default function Login() {
     },
     onSuccess: (data) => {
       toast.success("Successfully logged in");
-      
+      router.push("/");
     },
   });
 
@@ -32,7 +34,7 @@ export default function Login() {
           onSubmit={async (e) => {
                e.preventDefault();
                await mutate({ username: username, password: password });
-               window.location.href = "/";
+              //  window.location.href = "/";
           }}
           action=""
           method="post"

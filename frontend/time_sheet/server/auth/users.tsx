@@ -10,7 +10,7 @@ interface userLoginForm {
 
 
 export const loginUser = async ({ username, password }: userLoginForm) => {
-     
+     console.log("loginUser called");
      console.log(username , password , config().API_URL);
      const response = await fetch(config().API_URL + '/auth/login', {
           method: 'POST',

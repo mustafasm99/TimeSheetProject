@@ -13,7 +13,7 @@ import { Search } from "lucide-react";
 
 import { useState } from "react";
 import ProfileHolder from "@/components/profile-holder/profile-holder";
-import CreateTaskForm from "@/components/tasks/create_tasks";
+import CreateTaskForm , {CreateTaskButton} from "@/components/tasks/create_tasks";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -34,7 +34,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className="center h-full dark"
+      className="center h-full overflow-x-hidden dark"
       style={{ colorScheme: "dark" }}
     >
       <body
@@ -72,9 +72,9 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
         ) : (
           <SidebarProvider>
             <AppSidebar />
-            <main className="w-full bg-">
+            <main className="w-full">
               <SidebarTrigger />
-              <div className="flex flex-col flex-1 w-full px-2">
+              <div className="flex flex-col flex-1 w-full px-2 ">
                 <div className="flex flex-row justify-between w-full align-baseline items-center">
                   <div className="container search-holder w-full h-20 mx-5 rounded-md">
                     <div className="h-full relative">
