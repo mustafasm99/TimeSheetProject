@@ -1,5 +1,6 @@
 from pydantic_settings import BaseSettings , SettingsConfigDict
 from enum import Enum
+import os
 
 class DatabaseTypes(str, Enum):
     sqlite = "sqlite"
@@ -13,7 +14,7 @@ class Settings(BaseSettings):
     API_VERSION: str
     
     DATABASE_TYPE: str = DatabaseTypes.sqlite
-    
+    BASE_DIR:str = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     
     
     DATABASE_USERNAME: str|None = None

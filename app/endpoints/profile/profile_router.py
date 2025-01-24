@@ -14,6 +14,8 @@ from app.models.user_model import User
 from pathlib import Path
 import shutil
 
+import uuid
+
 class CreateProfile(BaseModel):
     user_id: int
     bio: str
@@ -99,7 +101,7 @@ class ProfileRouter(BaseRouter[Profile, CreateProfile]):
      if file.content_type not in ["image/jpeg", "image/png"]:
          raise HTTPException(status_code=400, detail="Invalid file type")
      if file is not None and file.filename:
-          filePath = Path(media_path) / file.filename
+          filePath = Path(media_path) / str(uuid.uuid4()) + "-" + file.filename
           with open(filePath, "wb") as buffer:
                shutil.copyfileobj(file.file, buffer)
           profile:Profile =  await self.get_one(user.id)

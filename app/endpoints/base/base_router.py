@@ -36,21 +36,21 @@ class BaseRouter(Generic[_ModelType, _CreateType]):
             path="/",
             endpoint=self.read_all,
             methods=["GET"],
-            response_model=List[self.model],
+            # response_model=List[self.model],
             dependencies=self.auth_object,
         )
         self.router.add_api_route(
             path="/{id}",
             endpoint=self.get_one,
             methods=["GET"],
-            response_model=self.model,
+            # response_model=self.model,
             dependencies=self.auth_object,
         )
         self.router.add_api_route(
             path="/",
             endpoint=self.create,
             methods=["POST"],
-            response_model=self.model,
+            # response_model=self.model,
             status_code=status.HTTP_201_CREATED,
             response_model_exclude_none=True,
             dependencies=self.auth_object,
@@ -61,7 +61,7 @@ class BaseRouter(Generic[_ModelType, _CreateType]):
             path="/{id}",
             endpoint=self.update,
             methods=["PUT"],
-            response_model=self.model,
+            # response_model=self.model,
             dependencies=self.auth_object,
             status_code=status.HTTP_200_OK,
         )

@@ -1,10 +1,11 @@
 "use client";
 import {useAppContext} from "@/context/index";
 import Login from "./auth/page";
+import AdminTools from "@/components/dashboard/admin/admin-tools";
 
 export default function Home() {
 
-  const {token} = useAppContext();
+  const {token , user} = useAppContext();
   if(token === null) {
     return (
       <div className="flex flex-col align-center justify-center text-center my-10">
@@ -16,10 +17,8 @@ export default function Home() {
     );
   }
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <h1>
-        hello world
-      </h1>
+    <div className="flex flex-col gap-5  my-2 w-full">
+        <AdminTools />
     </div>
   );
 }

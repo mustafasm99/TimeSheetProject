@@ -10,6 +10,14 @@ from sqlmodel import select
 from app.models.user_model import User
 
 
+class ReadAllTeamResponse(BaseModel):
+    id: int
+    name: str
+    description: str
+    members_limit: int
+    team_members: list[User]|None
+    projects: list[Project]|None
+    team_leader: User
 
 class CreateTeam(BaseModel):
     name: str
@@ -60,7 +68,31 @@ class TeamRouter(BaseRouter[Team, CreateTeam]):
             endpoint=self.get_team_members,
             response_model=list[User],
         )
-
+        
+    async def read_all(self)->list[ReadAllTeamResponse|None]:
+        result:list[ReadAllTeamResponse|None] = []
+        data:list[Team|None] = await super().read_all()
+        for team in data:
+            team_leader = next(
+                (member.user for member in team.team_members if member.is_leader), 
+                None
+            )
+            result.append(
+                ReadAllTeamResponse(
+                    id=team.id,
+                    name=team.name,
+                    description=team.description,
+                    team_leader_id=team_leader.id,
+                    members_limit=team.members_limit,
+                    team_members=[ member.user for member in team.team_members],
+                    projects=team.projects,
+                    team_leader=team_leader
+                )
+            )
+        return result
+        
+        
+        
     async def get_team_members(
         self, id: int, user: User = Depends(authentication.get_current_user)
     ):
@@ -76,6 +108,11 @@ class TeamRouter(BaseRouter[Team, CreateTeam]):
         logging.info(f"Create result: {result}")
         if not result:
             raise HTTPException(status_code=400, detail="Creation failed")
+        team_member = Team_Member(user_id=data.team_leader_id, team_id=result.id, is_leader=True)
+        
+        self.controller.session.add(team_member)
+        self.controller.session.commit()
+        
         return result
 
     async def update(self, id, data: CreateTeam = Body(...)):

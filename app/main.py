@@ -3,6 +3,8 @@ from fastapi.routing import APIRoute
 from app.core.conf import settings
 from app.endpoints.main import router as api_router
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
+from app.core.conf import settings
 
 
 def custom_generate_unique_id(router:APIRoute):
@@ -24,5 +26,5 @@ app.add_middleware(
 )
 
 app.include_router(api_router)
-
+app.mount("/static", StaticFiles(directory=settings.BASE_DIR+"/media"), name="static")
 
