@@ -14,6 +14,11 @@ type postRequestsType = {
      data:object;
 }
 
+type deleteRequestsType = {
+     token?:string;
+     url:string;
+}
+
 export function getRequests(
 {
      token,
@@ -50,6 +55,29 @@ export function postRequests(
           body: JSON.stringify(data),
      });
      const res = response.then((res) => res.json());
+
+     return data;
+}
+
+export function deleteRequests(
+{
+     token,
+     url,
+}:deleteRequestsType
+){
+     const response = fetch(base_url + url, {
+          method: "DELETE",
+          headers: {
+               "Content-Type": "application/json",
+               "Authorization": `Bearer ${token}`,
+          }
+     });
+     const data = response.then((res) => {
+          if(res.status === 204){
+               return "Deleted successfully";
+          }
+          return res.json();
+     });
 
      return data;
 }

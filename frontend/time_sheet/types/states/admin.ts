@@ -7,4 +7,11 @@ export type AdminSite = {
      teams: TeamType[],
      projects: ProjectType[],
      users: UserType[],
+     project_statuses: project_statuses[],
 };
+
+type project_statuses = {
+     description : string,
+     id: number,
+     title : string,
+}

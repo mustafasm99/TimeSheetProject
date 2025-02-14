@@ -7,6 +7,7 @@ import logging
 from app.controller.auth import authentication
 from fastapi import Depends
 from app.models.user_model import User
+from datetime import datetime
 
 
 class CreateProject(BaseModel):
@@ -17,9 +18,8 @@ class CreateProject(BaseModel):
     end_date: str
     team_id: int
     members_limit: int
-    team_leader_id: int
     project_manager_id: int
-    project_status_id: int
+#     project_status_id: int
 
 class ProjectRouter(BaseRouter[Project, CreateProject]):
      def __init__(self):
@@ -51,7 +51,16 @@ class ProjectRouter(BaseRouter[Project, CreateProject]):
           return projects
      
      async def create(self, data: CreateProject = Body(...)):
-          result = await super().create(data=data)
+          new_project = Project(
+                  name=data.title,
+                  description=data.description,
+                  start_time=datetime.strptime(data.start_date, "%Y-%m-%d"),
+                  end_time=datetime.strptime(data.end_date, "%Y-%m-%d"),
+                  team_id=data.team_id,
+                  members_limit=data.members_limit,
+                  project_manager_id=data.project_manager_id,
+          )
+          result = await super().create(data=new_project)
           logging.info(f"Create result: {result}")  # Log the result
           if not result:
                # Handle error: maybe raise an HTTPException

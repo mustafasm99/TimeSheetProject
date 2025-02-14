@@ -58,12 +58,12 @@ class Project(SQLModel, table=True):
     )
     members_limit: int = Field(sa_column=Column(Integer))
     members_counter: int = Field(sa_column=Column(Integer))
-    team_leader_id: int = Field(
-        sa_column=Column(
-            Integer,
-            ForeignKey("users.id", ondelete="CASCADE"),
-        ),
-    )
+    # team_leader_id: int = Field(
+    #     sa_column=Column(
+    #         Integer,
+    #         ForeignKey("users.id", ondelete="CASCADE"),
+    #     ),
+    # )
     is_completed: bool = Field(sa_column=Column(Boolean, default=False))
     project_manager_id: int = Field(
         sa_column=Column(
