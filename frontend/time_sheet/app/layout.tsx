@@ -13,7 +13,12 @@ import { Search } from "lucide-react";
 
 import { useState } from "react";
 import ProfileHolder from "@/components/profile-holder/profile-holder";
-import CreateTaskForm , {CreateTaskButton} from "@/components/tasks/create_tasks";
+import CreateTaskForm, {
+  CreateTaskButton,
+} from "@/components/tasks/create_tasks";
+
+import { Provider } from "react-redux";
+import { store } from "./redux/store";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -40,18 +45,22 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased h-full center`}
       >
-        <ThemeProvider
-          attribute={"class"}
-          defaultTheme="system"
-          enableSystem
-          themes={["dark", "light"]}
-          disableTransitionOnChange={false}
-        >
-          {/* AppWrapper should wrap the entire layout */}
-          <AppWrapper>
-            <LayoutContent>{children}</LayoutContent>
-          </AppWrapper>
-        </ThemeProvider>
+        <Provider store={store}>
+          <ThemeProvider
+            attribute={"class"}
+            defaultTheme="system"
+            enableSystem
+            themes={["dark", "light"]}
+            disableTransitionOnChange={false}
+          >
+            {/* AppWrapper should wrap the entire layout */}
+            <AppWrapper>
+              <LayoutContent>
+                <main className="mx-5 my-2">{children}</main>
+              </LayoutContent>
+            </AppWrapper>
+          </ThemeProvider>
+        </Provider>
       </body>
     </html>
   );
@@ -102,8 +111,8 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
                     <ProfileHolder />
                   </div>
                 </div>
-                  {children}
-                  <CreateTaskForm />
+                {children}
+                <CreateTaskForm />
               </div>
             </main>
           </SidebarProvider>

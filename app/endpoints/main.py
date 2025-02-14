@@ -16,6 +16,8 @@ from .tasks.task_counter_type import task_counter_type_router
 from .users.users_endpoint import user_router
 from .profile.profile_router import profile_router
 from .project.team_members_routers import teamMembersRouter
+from .admin.admin_router import admin_router
+
 
 router = APIRouter()
 
@@ -36,3 +38,4 @@ router.include_router(task_counter_router.router)
 router.include_router(task_counter_type_router.router)
 router.include_router(user_router.router)
 router.include_router(profile_router.router)
+router.include_router(admin_router.router)
