@@ -15,7 +15,9 @@ from app.models.task.task_category_model import TaskCategory
 from app.models.task.task_counter_model import TaskCounter
 from app.models.task.task_counter_type_model import TaskCounterType
 from app.models.profile import Profile
+from app.models.attendance import Attendance
 from alembic import context
+
 
 __all__ = [
     "SQLModel",
@@ -35,6 +37,7 @@ __all__ = [
     "TaskCounter",
     "TaskCounterType",
     "Profile",
+    "Attendance",
 ]
 
 

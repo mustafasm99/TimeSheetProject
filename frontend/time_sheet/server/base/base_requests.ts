@@ -38,7 +38,7 @@ export function getRequests(
      return data;
 };
 
-export function postRequests(
+export async function postRequests(
 {
      token,
      url,

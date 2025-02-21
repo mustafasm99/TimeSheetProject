@@ -7,8 +7,9 @@ import { setState } from "@/app/redux/features/admin-site";
 import { getRequests } from "@/server/base/base_requests";
 import { useAppContext } from "@/context";
 import { AdminSite } from "@/types/states/admin";
-
-
+import UserManager from "./tools/users-manager";
+import Box from "@mui/material/Box";
+import Masonry from "@mui/lab/Masonry";
 
 export default function AdminTools() {
   const {token} = useAppContext()
@@ -28,9 +29,19 @@ export default function AdminTools() {
     return <div>Loading...</div>
   }
   return (
-    <div className="flex flex-row flex-wrap gap-4 justify-start items-start">
-      <TeamsManagement />
-      <ProjectsTools />
-    </div>
+    <Box className="w-full">
+      <Masonry
+        className="px-0 py-1"
+        columns = {3}
+        spacing={4}
+        defaultHeight={250}
+        defaultColumns={3}
+        sequential
+      >
+        <TeamsManagement />
+        <ProjectsTools />
+        <UserManager />
+      </Masonry>
+    </Box>
   );
 }

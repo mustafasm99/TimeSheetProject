@@ -46,14 +46,14 @@ export default function TeamsManagement() {
   });
   const adminData  = useAppSelector((state) => state.AdminStore);
   console.log(adminData , "From Redux State ")
-  function handle_submit(e: React.FormEvent<HTMLFormElement>) {
+  async function handle_submit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     const result = CreateTeamSchema.safeParse(createTeam);
     if (!result.success) {
       toast.error("Invalid form data");
       return;
     }
-    const createTeamResponse = postRequests({
+    const createTeamResponse = await postRequests({
       url: "team/",
       token: token as string,
       data: createTeam,
@@ -70,7 +70,7 @@ export default function TeamsManagement() {
   
   if(adminData)
   return (
-    <div className="w-fit h-fit p-5 bg-[#aaaaaa] rounded-xl">
+    <div className="min-w-[420px] h-fit p-5 bg-[#aaaaaa] rounded-xl">
       <div className="flex flex-row w-full justify-start items-start gap-2 text-white p-2 rounded-md">
         <form
           onSubmit={handle_submit}

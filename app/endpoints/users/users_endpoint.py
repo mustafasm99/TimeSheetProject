@@ -64,11 +64,15 @@ class UserRouter(BaseRouter[User, CreateUser]):
         return super().setup_routes()
  
     async def create(self, data: CreateUser = Body(...)):
-        result = await authentication.CreateUser(data=data , session=self.controller.session)
-        logging.info(f"Create result: {result}")
-        if not result:
-            raise HTTPException(status_code=400, detail="Creation failed")
-        return result
+        try:
+            result = authentication.CreateUser(data=data , session=self.controller.session)
+            logging.info(f"Create result: {result}")
+            if not result:
+                raise HTTPException(status_code=400, detail="Creation failed")
+            return result
+        except Exception as e:
+            logging.error(f"Error in create user: {e}")
+            raise HTTPException(status_code=400, detail="Creation failed email already exists")
 
     async def update(self, id:int|None = None, data: UpdateUser = Body(...) , user:User = Depends(authentication.get_current_user)):
         if not user.is_superuser:

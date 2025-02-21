@@ -22,7 +22,8 @@ import { Separator } from "@/components/ui/separator";
 import { ArrowBigRight } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { useDispatch } from "react-redux";
-import { add_project } from "@/app/redux/features/admin-site";
+import { add_project, add_project_status } from "@/app/redux/features/admin-site";
+import ProjectStatus from "./tools/project-status-management";
 
 const CreateProjectSchema = z.object({
   title: z.string(),
@@ -41,6 +42,7 @@ export default function ProjectsTools() {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [searchUser, setSearchUser] = useState<string>("");
   const [searchStatus, setSearchStatus] = useState<string>("");
+  const [projectStatus , setProjectStatus] = useState<string>("");
   const [formData, setFormData] = useState<z.infer<typeof CreateProjectSchema>>(
     {
       title: "",
@@ -56,7 +58,7 @@ export default function ProjectsTools() {
   const { mutate } = useMutation({
     mutationKey: ["create-project"],
     mutationFn: async () => {
-      const response = postRequests({
+      const response = await postRequests({
         url: "project/",
         token: token || "",
         data: formData,
@@ -78,8 +80,8 @@ export default function ProjectsTools() {
   })
 
   return (
-    <div className="flex flex-row justify-start items-start">
-      <div className="min-w-[320px] h-fit p-5 bg-white rounded-l-xl  flex flex-col justify-start items-start gap-2">
+    <div className="flex flex-row justify-start items-start min-w-[720px]">
+      <div className="w-full h-fit p-5 bg-white rounded-l-xl flex flex-col justify-start items-start gap-2">
         <h1 className="font-bold text-black text-xl ">Project Management</h1>
         <form
           action=""
@@ -198,7 +200,8 @@ export default function ProjectsTools() {
               <SelectGroup>
                 {adminData.teams
                   .filter((team) =>
-                    team.name.toLowerCase().includes(searchTerm.toLowerCase())
+                    team.name.toLowerCase().includes(searchTerm.toLowerCase())&&
+                    team.id !== undefined
                   )
                   .map((filteredTeam) => (
                     <SelectItem key={filteredTeam.id} value={filteredTeam.id.toString()}>
@@ -223,7 +226,12 @@ export default function ProjectsTools() {
           <Button className="w-full border-black border">Create Project</Button>
         </form>
       </div>
-      <div className="min-w-[320px] h-fit p-5 bg-white rounded-r-xl flex flex-col justify-start items-start gap-2">
+      <div className="w-fit h-fit p-5 bg-white rounded-r-xl rounded-bl-xl flex flex-col justify-start items-start gap-2">
+        
+        <h1 className="font-bold text-black text-xl mt-5">
+          Projects List
+        </h1>
+        
         <ScrollArea className="w-full h-96">
           {adminData.projects.map((project) => (
             <div key={project.id} className="bg-black rounded-lg p-4 w-full my-2">
@@ -269,14 +277,15 @@ export default function ProjectsTools() {
                     onChange={(e) => setSearchStatus(e.target.value)}
                   />
                   <SelectGroup>
-                    {adminData.project_statuses
+                    {adminData && adminData.project_statuses
                       .filter((team) =>
                         team.title
                           .toLowerCase()
                           .includes(searchStatus.toLowerCase())
+                        && team.id !== undefined
                       )
                       .map((filteredTeam) => (
-                        <SelectItem key={filteredTeam.id}  value={filteredTeam.id.toString()}>
+                        <SelectItem key={filteredTeam.id}  value={filteredTeam ? filteredTeam?.id.toString() : ""}>
                           {filteredTeam.title}
                         </SelectItem>
                       ))}
@@ -288,7 +297,12 @@ export default function ProjectsTools() {
             </div>
           ))}
         </ScrollArea>
+        <h1 className="font-bold text-black text-xl mt-5">
+          Project Status
+        </h1>
+        <ProjectStatus />
       </div>
+      
     </div>
   );
 }
