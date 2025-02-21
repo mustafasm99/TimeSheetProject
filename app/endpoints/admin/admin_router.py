@@ -5,8 +5,7 @@ from pydantic import BaseModel
 from fastapi import Depends, HTTPException
 from app.controller.auth import authentication
 from app.endpoints.project.team_routes import ReadAllTeamResponse, team_router
-from app.models.user_model import User
-from app.endpoints.users.users_endpoint import user_router
+from app.endpoints.users.users_endpoint import user_router , ReadUserObject
 from app.endpoints.project.project_status_routes import project_status_router
 from app.models.project_model import Project_Status
 
@@ -14,7 +13,7 @@ from app.models.project_model import Project_Status
 class AdminSiteResponse(BaseModel):
     teams: list[ReadAllTeamResponse]
     projects: list[Project]
-    users: list[User]
+    users: list[ReadUserObject]
     project_statuses: list[Project_Status]
 
 

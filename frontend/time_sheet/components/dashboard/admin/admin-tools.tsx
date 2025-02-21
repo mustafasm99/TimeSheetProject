@@ -10,6 +10,7 @@ import { AdminSite } from "@/types/states/admin";
 import UserManager from "./tools/users-manager";
 import Box from "@mui/material/Box";
 import Masonry from "@mui/lab/Masonry";
+import UserViewer from "./users-viewer";
 
 export default function AdminTools() {
   const {token} = useAppContext()
@@ -41,6 +42,7 @@ export default function AdminTools() {
         <TeamsManagement />
         <ProjectsTools />
         <UserManager />
+        <UserViewer />
       </Masonry>
     </Box>
   );

@@ -27,6 +27,19 @@ class UpdateUser(BaseModel):
     is_temp_password: bool
     team_id: int
 
+class ReadUserObject(BaseModel):
+    id: int
+    name: str
+    email: str
+    is_active: bool
+    is_superuser: bool
+    is_temp_password: bool
+    create_time: datetime
+    update_time: datetime
+    password: str
+    roll: str|None
+    team_name: str|None
+    image: str|None
 
 class UserRouter(BaseRouter[User, CreateUser]):
     def __init__(self):        
@@ -62,7 +75,30 @@ class UserRouter(BaseRouter[User, CreateUser]):
             response_model=User,
         )
         return super().setup_routes()
- 
+    
+    async def read_all(self)->list[ReadUserObject]:
+        data:list[User] = await super().read_all()
+        result = []
+        for user in data:
+            user_roll = ""
+            for roll in user.users_roll:
+                user_roll += roll.roll.name+" , "
+            result.append(ReadUserObject(
+                id=user.id,
+                name=user.name,
+                email=user.email,
+                is_active=user.is_active,
+                is_superuser=user.is_superuser,
+                is_temp_password=user.is_temp_password,
+                roll=user_roll,
+                team_name=user.team_members[0].team.name if user.team_members else None,
+                image=str(user.profile.id )if user.profile else None,
+                create_time=user.create_time,
+                update_time=user.update_time,
+                password=user.password
+            ))
+        return result
+    
     async def create(self, data: CreateUser = Body(...)):
         try:
             result = authentication.CreateUser(data=data , session=self.controller.session)
