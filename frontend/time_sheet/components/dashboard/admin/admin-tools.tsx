@@ -11,6 +11,15 @@ import UserManager from "./tools/users-manager";
 import Box from "@mui/material/Box";
 import Masonry from "@mui/lab/Masonry";
 import UserViewer from "./users-viewer";
+import TaskStatusManager from "./tools/tasks-status-manager";
+import { TaskCategory, TaskStatus } from "@/types/states/tasks";
+import { setCategories, setTaskStatuses } from "@/app/redux/features/tasks-sites";
+
+type TaskMangerResponse = {
+  task_statuses:TaskStatus[];
+  task_categories:TaskCategory[];
+}
+
 
 export default function AdminTools() {
   const {token} = useAppContext()
@@ -26,6 +35,19 @@ export default function AdminTools() {
       return response as AdminSite;
     }
   });
+  const { data:TaskManger , isLoading:TaskMangerLoader } = useQuery({
+    queryKey:["tasks"],
+    queryFn: async () => {
+         const response = await getRequests({
+              url: "admin/task_manager",
+              token: token as string,
+         })
+         const responseData = response as TaskMangerResponse;
+         dispatch(setCategories(responseData.task_categories));
+         dispatch(setTaskStatuses(responseData.task_statuses));
+         return responseData;
+    }
+});
   if(isLoading){
     return <div>Loading...</div>
   }
@@ -43,6 +65,7 @@ export default function AdminTools() {
         <ProjectsTools />
         <UserManager />
         <UserViewer />
+        <TaskStatusManager />
       </Masonry>
     </Box>
   );
