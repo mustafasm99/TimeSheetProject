@@ -8,6 +8,8 @@ class UserCreate(BaseModel):
      email:str
      password:str
      name:str
+     is_temp_password:bool = False
+     is_superuser:bool = False
 
 
 

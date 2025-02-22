@@ -28,7 +28,7 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
       }
     });
   }, [user]);
-
+  console.log(user)
   return (
     <AppContext.Provider value={{ token, setToken, user: user }}>
       {children}

@@ -20,6 +20,10 @@ class CreateProfile(BaseModel):
     user_id: int
     bio: str
 
+class CreateProfileForm(BaseModel):
+    bio:str = Body(...)
+    image:UploadFile = File(...)
+
 class UserData(BaseModel):
     name:str
     email:str
@@ -70,9 +74,19 @@ class ProfileRouter(BaseRouter[Profile, CreateProfile]):
 
     async def create(
         self,
-        data: CreateProfile = Body(...),
+        user:User = Depends(authentication.get_current_user),
+        data: CreateProfileForm = Depends(),
     ):
-        result = await super().create(data=data)
+        result = await super().create(data=
+            CreateProfile(
+                user_id=user.id,
+                bio=data.bio,
+            )
+        )
+        await self.upload_profile_image(
+            file=data.image,
+            user=user,
+        )
         logging.info(f"Create result: {result}")
         if not result:
             raise HTTPException(status_code=400, detail="Creation failed")
@@ -86,7 +100,7 @@ class ProfileRouter(BaseRouter[Profile, CreateProfile]):
         return result
 
     async def profileMe(self, user: User = Depends(authentication.get_current_user))->ProfileData:
-        profile = await self.get_one(user.id)
+        profile = await self.get_one(user.profile.id)
         if not profile:
             raise HTTPException(status_code=404, detail="Profile not found")
         return ProfileData(**profile.dict(), user=UserData(**user.model_dump()))
@@ -101,10 +115,10 @@ class ProfileRouter(BaseRouter[Profile, CreateProfile]):
      if file.content_type not in ["image/jpeg", "image/png"]:
          raise HTTPException(status_code=400, detail="Invalid file type")
      if file is not None and file.filename:
-          filePath = Path(media_path) / str(uuid.uuid4()) + "-" + file.filename
+          filePath = str(media_path)+"/"+str(uuid.uuid4())+"-"+file.filename
           with open(filePath, "wb") as buffer:
                shutil.copyfileobj(file.file, buffer)
-          profile:Profile =  await self.get_one(user.id)
+          profile:Profile =  await self.get_one(user.profile.id)
           profile.profile_image = str(filePath)
           self.controller.session.add(profile)
           self.controller.session.commit()

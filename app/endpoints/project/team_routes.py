@@ -125,6 +125,8 @@ class TeamRouter(BaseRouter[Team, CreateTeam]):
     async def my_teams(
         self, user: User = Depends(authentication.get_current_user)
     ) -> myTeam|None:
+        if len(user.team_members) > 0:
+            return None
         query = select(Team).where(Team.id == user.team_members[-1].team_id)
         result = self.controller.session.exec(query).first()
         if not result:

@@ -12,6 +12,8 @@ type postRequestsType = {
      url:string;
      queryKey?:string;
      data:object;
+     headers?:{};
+     stringify?:boolean;
 }
 
 type deleteRequestsType = {
@@ -50,16 +52,18 @@ export async function postRequests(
      token,
      url,
      queryKey = "",
-     data
+     headers = {},
+     data,
+     stringify = true
 }:postRequestsType
 ){
      const response = fetch(base_url + url + queryKey, {
           method: "POST",
-          headers: {
+          headers: Object.keys(headers).length === 0 ?{
                "Content-Type": "application/json",
                "Authorization": `Bearer ${token}`,
-          },
-          body: JSON.stringify(data),
+          }:headers,
+          body: stringify ? JSON.stringify(data) : (data instanceof FormData ? data : JSON.stringify(data)),
      });
      const res = response.then((res) => res.json());
 

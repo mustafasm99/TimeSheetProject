@@ -7,4 +7,6 @@ export type UserType = {
      roll?:string;
      team_name?:string;
      image?:string;
+     is_temp_password?:boolean;
+     have_profile?:boolean;
 }

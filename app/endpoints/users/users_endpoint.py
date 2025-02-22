@@ -10,6 +10,10 @@ from app.controller.auth import authentication
 from fastapi import Depends
 from sqlmodel import select
 from datetime import datetime
+from app.models.project_model import Team_Member
+from app.endpoints.project.team_members_routers import CreateTeamMember, teamMembersRouter
+
+
 class CreateUser(BaseModel):
     name: str
     email: str
@@ -40,6 +44,7 @@ class ReadUserObject(BaseModel):
     roll: str|None
     team_name: str|None
     image: str|None
+    have_profile:bool|None
 
 class UserRouter(BaseRouter[User, CreateUser]):
     def __init__(self):        
@@ -60,7 +65,7 @@ class UserRouter(BaseRouter[User, CreateUser]):
            methods=["GET"],
            path="/me",
            endpoint = self.get_me,
-           response_model=User,
+           response_model=ReadUserObject,
         ) 
         self.router.add_api_route(
             methods=["PUT"],
@@ -101,7 +106,8 @@ class UserRouter(BaseRouter[User, CreateUser]):
                 image=self.get_image_url(user.profile.profile_image) if user.profile else None,
                 create_time=user.create_time,
                 update_time=user.update_time,
-                password=user.password
+                password=user.password,
+                have_profile=False,
             ))
         return result
     
@@ -109,6 +115,16 @@ class UserRouter(BaseRouter[User, CreateUser]):
         try:
             result = authentication.CreateUser(data=data , session=self.controller.session)
             logging.info(f"Create result: {result}")
+            
+            if data.team_id is not None and data.team_id > 0:
+                await teamMembersRouter.create(
+                    CreateTeamMember(
+                        team_id=data.team_id,
+                        user_id=result.id,
+                        is_leader=False,
+                        is_active=True
+                    )
+                )
             if not result:
                 raise HTTPException(status_code=400, detail="Creation failed")
             return ReadUserObject(
@@ -147,8 +163,23 @@ class UserRouter(BaseRouter[User, CreateUser]):
             raise HTTPException(status_code=400, detail="Update failed")
         return MessageResponse(message="User updated successfully")
 
-    async def get_me(self, user: User = Depends(authentication.get_current_user)):
-        return user
+    async def get_me(self, user: User = Depends(authentication.get_current_user))->ReadUserObject:
+        user = user
+        return ReadUserObject(
+            id=user.id,
+            email=user.email,
+            create_time=user.create_time,
+            have_profile=user.profile is not None,
+            is_active=user.is_active,
+            image=self.get_image_url(user.profile.profile_image if user.profile else ""),
+            is_superuser=user.is_superuser,
+            is_temp_password=user.is_temp_password,
+            name=user.name,
+            password=user.password,
+            roll=str([ i.roll for i in  user.users_roll]).replace("[","").replace("]",""),
+            team_name=user.team_members[-1].team.name,
+            update_time=user.update_time,
+        )
     
     async def reset_password(self, data: SetNewPassword = Body(...)):
         result = authentication.reset_password(data=data , session=self.controller.session)

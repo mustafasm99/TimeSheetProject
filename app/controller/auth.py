@@ -93,6 +93,8 @@ class Auth:
             email=data.email,
             password=self.get_hash_password(data.password),
             name=data.name,
+            is_temp_password=data.is_temp_password,
+            is_superuser=data.is_superuser,
         )
         session.add(user)
         session.commit()

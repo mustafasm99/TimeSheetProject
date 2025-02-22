@@ -2,6 +2,7 @@
 import {useAppContext} from "@/context/index";
 import Login from "./auth/page";
 import AdminTools from "@/components/dashboard/admin/admin-tools";
+import FinishUserInfo from "@/components/users/finish-user";
 
 export default function Home() {
 
@@ -16,9 +17,17 @@ export default function Home() {
       </div>
     );
   }
+  console.log(user)
   return (
     <div className="flex flex-col gap-5  my-2 w-full">
-        <AdminTools />
+        {
+          user?.is_superuser ? <AdminTools /> :
+          user?.is_temp_password ? <FinishUserInfo user={user} />
+          :
+          <div>
+            Home Page
+          </div>
+        }
     </div>
   );
 }

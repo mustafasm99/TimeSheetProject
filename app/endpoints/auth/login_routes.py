@@ -47,6 +47,10 @@ async def change_password(
           user_id=user.id,
           session=session,
      )
+     user.is_temp_password = False
+     session.add(user)
+     session.commit()
+     session.refresh(user)
      return BaseResponse(
           message="Password Changed",
           data=None

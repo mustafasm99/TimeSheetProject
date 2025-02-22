@@ -17,11 +17,11 @@ import {
   LogOut,
 } from "lucide-react";
 import { useSidebar } from "@/components/ui/sidebar";
-import { stat } from "fs";
+import { useRouter} from "next/navigation";
 
 export default function AppSidebar() {
   const { state } = useSidebar();
-
+  const router = useRouter();
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
@@ -115,22 +115,22 @@ export default function AppSidebar() {
         )}
       </SidebarContent>
       <SidebarFooter>
+        <button
+        className={`w-full py-4 bg-red-500 text-white items-center justify-center flex rounded-lg${state == "collapsed" ? "h-fit rounded-lg" : " "}`}
+          onClick={() => {
+            localStorage.clear();
+            window.location.reload()
+            router.refresh();
+          }}
+        >
           {
-               state == "collapsed" ?
-                (
-                    <a href="/logout" className="block mx-auto">
-                         <LogOut />
-                    </a>
-                )
-                 :
-                (
-                <a href="/" className="block py-2 px-4" onClick={()=>{
-                  localStorage.clear();
-                }}>
-                    Logout
-                </a>
-               )
+            state == "collapsed" ? (
+              <LogOut />
+            ) : (
+              "Logout"
+            )
           }
+        </button>
         
       </SidebarFooter>
     </Sidebar>

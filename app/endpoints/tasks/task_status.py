@@ -19,21 +19,24 @@ class TaskStatusRouter(BaseRouter[TaskStatus, CreateTaskStatus]):
                model=TaskStatus,
                create_type=CreateTaskStatus,
                prefix="/task_status",
-               auth_object=[Depends(authentication.get_admin_user)],
+               auth_object=[Depends(authentication.get_current_user)],
           )
      
-     async def create(self, data: CreateTaskStatus = Body(...)):
+     async def create(self, data: CreateTaskStatus = Body(...) , admin = Depends(authentication.get_admin_user)):
           result = await super().create(data=data)
           logging.info(f"Create result: {result}")  # Log the result
           if not result:
                # Handle error: maybe raise an HTTPException
                raise HTTPException(status_code=400, detail="Creation failed")
           return result
-     async def update(self, id, data: CreateTaskStatus = Body(...)):
+     async def update(self, id, data: CreateTaskStatus = Body(...) , admin = Depends(authentication.get_admin_user)):
             result = await super().update(id=id, data=data)
             logging.info(f"Update result: {result}")
             if not result:
                   raise HTTPException(status_code=400, detail="Update failed")
             return result
+       
+     async def delete(self , id:int , admin = Depends(authentication.get_admin_user)):
+          super().delete(id=id)
 
 task_status_router = TaskStatusRouter()
