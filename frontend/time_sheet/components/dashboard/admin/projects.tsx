@@ -24,6 +24,7 @@ import { Badge } from "@/components/ui/badge";
 import { useDispatch } from "react-redux";
 import { add_project, add_project_status } from "@/app/redux/features/admin-site";
 import ProjectStatus from "./tools/project-status-management";
+import { v4 as uuidv4 } from "uuid";
 
 const CreateProjectSchema = z.object({
   title: z.string(),
@@ -39,6 +40,7 @@ export default function ProjectsTools() {
  
   const dispatch = useDispatch();
   const adminData = useAppSelector((state) => state.AdminStore);
+  console.log(adminData , "from projects tools");
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [searchUser, setSearchUser] = useState<string>("");
   const [searchStatus, setSearchStatus] = useState<string>("");
@@ -146,7 +148,7 @@ export default function ProjectsTools() {
                     user.name.toLowerCase().includes(searchUser.toLowerCase())
                   )
                   .map((user) => (
-                    <SelectItem key={user.id} value={user.id.toString()}>
+                    <SelectItem key={user.id === undefined ? uuidv4() : user.id} value={user.id === undefined ? "" : user.id.toString()}>
                       {user.name}
                     </SelectItem>
                   ))}

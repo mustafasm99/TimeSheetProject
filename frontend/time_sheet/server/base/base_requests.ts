@@ -19,6 +19,13 @@ type deleteRequestsType = {
      url:string;
 }
 
+type putRequestsType = {
+     url:string;
+     token?:string;
+     queryKey?:string;
+     data?:object;
+}
+
 export function getRequests(
 {
      token,
@@ -56,7 +63,7 @@ export async function postRequests(
      });
      const res = response.then((res) => res.json());
 
-     return data;
+     return res;
 }
 
 export function deleteRequests(
@@ -80,4 +87,23 @@ export function deleteRequests(
      });
 
      return data;
+}
+
+export async function putRequests(
+{
+     token,
+     url,
+     queryKey = "",
+     data
+}:putRequestsType
+){
+     const response = fetch(base_url + url + queryKey, {
+          method: "PUT",
+          headers: {
+               "Content-Type": "application/json",
+               "Authorization": `Bearer ${token}`,
+          },
+          body: JSON.stringify(data),
+     });
+     const res = response.then((res) => res.json());
 }

@@ -50,9 +50,7 @@ class BaseRouter(Generic[_ModelType, _CreateType]):
             path="/",
             endpoint=self.create,
             methods=["POST"],
-            # response_model=self.model,
             status_code=status.HTTP_201_CREATED,
-            response_model_exclude_none=True,
             dependencies=self.auth_object,
             summary="Create a new item",
             description="Creates an item based on the provided schema.",
@@ -102,3 +100,10 @@ class BaseRouter(Generic[_ModelType, _CreateType]):
             return HTTPException(status_code=status.HTTP_204_NO_CONTENT)
         else:    
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    
+    def get_image_url(self , image_path:str):
+        image_path = image_path.replace("app/","")
+        image_path = image_path.replace("app\\","")
+        image_path = image_path.replace("\\","/")
+        image_path = image_path.replace("media/","")
+        return f"/static/{image_path}"

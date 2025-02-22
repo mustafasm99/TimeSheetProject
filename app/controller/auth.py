@@ -66,6 +66,11 @@ class Auth:
         query = select(User).where(User.email == data.username)
         user = session.exec(query).first()
         
+        if user and not user.is_active:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, detail="User is deactivated"
+            )
+        
         if user and self.verify_password(
             plain_password=data.password,
             hashed_password=user.password
@@ -120,6 +125,20 @@ class Auth:
         user = session.exec(query).first()
         if user:
             user.password = self.get_hash_password(data.new_password)
+            session.add(user)
+            session.commit()
+            return True
+        return False
+    
+    def deactivate_user(
+        self,
+        session: Session,
+        user_id:int
+    )->bool:
+        query = select(User).where(User.id == user_id)
+        user = session.exec(query).first()
+        if user:
+            user.is_active = False
             session.add(user)
             session.commit()
             return True

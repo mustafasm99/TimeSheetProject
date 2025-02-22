@@ -1,5 +1,6 @@
 import {createSlice } from '@reduxjs/toolkit';
 import { AdminSite } from '@/types/states/admin';
+import { UserType } from '@/types/user';
 
 const initialState:AdminSite = {
      teams: [],
@@ -33,8 +34,8 @@ export const adminSlice = createSlice({
           add_team: (state, action) => {
                state.teams.push(action.payload);
           },
-          add_user: (state, action) => {
-               state.users.push(action.payload);
+          add_user: (state, action:{payload:UserType}) => {
+               state.users = [...state.users , action.payload];
           },
           add_project_status: (state, action) => {
                state.project_statuses.push(action.payload);

@@ -74,6 +74,12 @@ class UserRouter(BaseRouter[User, CreateUser]):
             endpoint=self.reset_password,
             response_model=User,
         )
+        self.router.add_api_route(
+            methods=["PUT"],
+            path="/deactivate/{id}",
+            endpoint=self.deactivate_user,
+            response_model=MessageResponse,
+        )
         return super().setup_routes()
     
     async def read_all(self)->list[ReadUserObject]:
@@ -92,20 +98,33 @@ class UserRouter(BaseRouter[User, CreateUser]):
                 is_temp_password=user.is_temp_password,
                 roll=user_roll,
                 team_name=user.team_members[0].team.name if user.team_members else None,
-                image=str(user.profile.id )if user.profile else None,
+                image=self.get_image_url(user.profile.profile_image) if user.profile else None,
                 create_time=user.create_time,
                 update_time=user.update_time,
                 password=user.password
             ))
         return result
     
-    async def create(self, data: CreateUser = Body(...)):
+    async def create(self, data: CreateUser = Body(...))->ReadUserObject:
         try:
             result = authentication.CreateUser(data=data , session=self.controller.session)
             logging.info(f"Create result: {result}")
             if not result:
                 raise HTTPException(status_code=400, detail="Creation failed")
-            return result
+            return ReadUserObject(
+                id=result.id,
+                name=result.name,
+                email=result.email,
+                is_active=result.is_active,
+                is_superuser=result.is_superuser,
+                is_temp_password=result.is_temp_password,
+                roll=None,
+                team_name=result.team_members[0].team.name if result.team_members else None,
+                image=self.get_image_url(result.profile.profile_image) if result.profile else None,
+                create_time=result.create_time,
+                update_time=result.update_time,
+                password=result.password
+            )
         except Exception as e:
             logging.error(f"Error in create user: {e}")
             raise HTTPException(status_code=400, detail="Creation failed email already exists")
@@ -137,5 +156,12 @@ class UserRouter(BaseRouter[User, CreateUser]):
         if not result:
             raise HTTPException(status_code=400, detail="Reset password failed")
         return MessageResponse(message="Password reset successfully")
+    
+    async def deactivate_user(self, id:int):
+        result = authentication.deactivate_user(user_id=id , session=self.controller.session)
+        logging.info(f"Deactivate user result: {result}")
+        if not result:
+            raise HTTPException(status_code=400, detail="Deactivation failed")
+        return MessageResponse(message="User deactivated successfully")
 
 user_router = UserRouter()

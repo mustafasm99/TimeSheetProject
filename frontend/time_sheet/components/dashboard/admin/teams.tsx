@@ -110,8 +110,12 @@ export default function TeamsManagement() {
               <Input placeholder="Search Team Leader" className="my-5" />
               <SelectGroup>
                  {(
-                  adminData.users?.map((user) => (
-                    <SelectItem key={user.id} value={user.id.toString()}>
+                  adminData.users
+                  ?.filter((user)=> user.id !== undefined)
+                  ?.map((user) => (
+                    <SelectItem key={user.id} value={
+                      user.id === undefined ? "": user.id.toString()
+                    }>
                       {user.email}
                     </SelectItem>
                   ))

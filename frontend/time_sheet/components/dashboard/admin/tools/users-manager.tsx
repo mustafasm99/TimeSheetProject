@@ -1,4 +1,4 @@
-import {z} from "zod";
+import {set, z} from "zod";
 import {useState} from "react";
 import {useMutation} from "@tanstack/react-query";
 import {postRequests} from "@/server/base/base_requests";
@@ -19,6 +19,7 @@ import {
    } from "@/components/ui/select";
 import { useAppSelector } from "@/app/redux/store";
 import { Button } from "@/components/ui/button";
+import { UserType } from "@/types/user";
 
 
 
@@ -60,6 +61,17 @@ export default function UserManager(){
                     token: token as string,
                     data: user,
                });
+               dispatch(add_user(response as UserType));
+               toast.success("User Created");
+               setUser({
+                    name: "",
+                    email: "",
+                    password: "",
+                    is_superuser: false,
+                    team_id: 0,
+                    is_temp_password: false,
+                    is_active: true,
+               });
                return response;
           },
      })
@@ -77,6 +89,7 @@ export default function UserManager(){
                <Input 
                className="bg-green-100 text-black"
                placeholder="Enter new Employ Name" 
+               value={user.name}
                onChange={(e)=>{
                     setUser({...user, name: e.target.value});
                }}>
@@ -84,7 +97,8 @@ export default function UserManager(){
                <Label>
                     Email
                </Label>
-               <Input 
+               <Input
+               value={user.email}
                className="bg-green-100 text-black"
                placeholder="Enter new Employ Email" 
                onChange={(e)=>{
@@ -95,6 +109,7 @@ export default function UserManager(){
                     Password
                </Label>
                <Input
+               value={user.password}
                className="bg-green-100 text-black" 
                placeholder="Enter new Employ Password" 
                onChange={(e)=>{
@@ -102,7 +117,10 @@ export default function UserManager(){
                }}>
                </Input>
                <div className="flex flex-row w-full gap-4">
-                    <input type="checkbox" onChange={(e)=>{
+                    <input type="checkbox"
+                    checked={user.is_superuser}
+                    value={user.is_superuser.toString()}
+                    onChange={(e)=>{
                          setUser({...user, is_superuser: e.target.checked});
                     }}>
                     </input>
@@ -111,7 +129,10 @@ export default function UserManager(){
                     </Label>
                </div>
                <div className="flex flex-row w-full gap-4">
-                    <input type="checkbox" onChange={(e)=>{
+                    <input type="checkbox" 
+                    value={user.is_temp_password.toString()}
+                    checked={user.is_temp_password}
+                    onChange={(e)=>{
                          setUser({...user, is_temp_password: e.target.checked});
                     }}>
                     </input>
@@ -126,6 +147,7 @@ export default function UserManager(){
                     onValueChange={(value)=>{
                          setUser({...user, team_id: parseInt(value)});
                     }}
+                    value={user.team_id.toString()}
                >
                     <SelectTrigger className="bg-green-100 text-black">
                          <SelectValue placeholder="select team for the user"/>
@@ -149,9 +171,7 @@ export default function UserManager(){
                          </SelectGroup>
                     </SelectContent>
                </Select>
-               <Button type="submit" onClick={()=>{
-                    mutate();
-               }}>
+               <Button type="submit">
                     Create User
                </Button>
           </form>
