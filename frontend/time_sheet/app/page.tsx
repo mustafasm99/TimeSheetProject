@@ -3,6 +3,7 @@ import {useAppContext} from "@/context/index";
 import Login from "./auth/page";
 import AdminTools from "@/components/dashboard/admin/admin-tools";
 import FinishUserInfo from "@/components/users/finish-user";
+import HomePage from "@/components/pages/home_page";
 
 export default function Home() {
 
@@ -24,9 +25,7 @@ export default function Home() {
           user?.is_superuser ? <AdminTools /> :
           user?.is_temp_password ? <FinishUserInfo user={user} />
           :
-          <div>
-            Home Page
-          </div>
+          <HomePage />
         }
     </div>
   );

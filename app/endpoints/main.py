@@ -18,6 +18,8 @@ from .profile.profile_router import profile_router
 from .project.team_members_routers import teamMembersRouter
 from .admin.admin_router import admin_router
 from .attendance.attendance_router import attendance_router
+from .pages.pages_router import page_router
+
 
 router = APIRouter()
 
@@ -40,3 +42,4 @@ router.include_router(user_router.router)
 router.include_router(profile_router.router)
 router.include_router(admin_router.router)
 router.include_router(attendance_router.router)
+router.include_router(page_router.router)

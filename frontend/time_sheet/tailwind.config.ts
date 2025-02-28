@@ -16,6 +16,7 @@ export default {
   			foreground: 'hsl(var(--foreground))',
 			BorderColor:'var(--border-color)',
 			hoverColor : 'var(--hover-color)',
+			widgetsColor : 'var(--widgets-color)',
   			card: {
   				DEFAULT: 'hsl(var(--card))',
   				foreground: 'hsl(var(--card-foreground))'

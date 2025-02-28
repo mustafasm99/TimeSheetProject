@@ -21,6 +21,8 @@ class CreateProject(BaseModel):
     project_manager_id: int
 #     project_status_id: int
 
+
+
 class ProjectRouter(BaseRouter[Project, CreateProject]):
      def __init__(self):
           super().__init__(
