@@ -12,7 +12,7 @@ interface AppContextProps {
 const AppContext = createContext<AppContextProps | undefined>(undefined);
 
 export function AppWrapper({ children }: { children: React.ReactNode }) {
-  const [token, setToken] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
   const [user, setUser] = useState<UserType | null>(null);
 
   useEffect(() => {
@@ -28,7 +28,7 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
       }
     });
   }, [user]);
-  console.log(user)
+
   return (
     <AppContext.Provider value={{ token, setToken, user: user }}>
       {children}

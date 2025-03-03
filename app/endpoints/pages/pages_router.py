@@ -3,14 +3,13 @@ from app.models.project_model import Project, Team
 from app.endpoints.base.base_router import BaseRouter
 from app.controller.base_controller import BaseController
 from pydantic import BaseModel
-from fastapi import Body, HTTPException
 from sqlmodel import select
 from app.controller.auth import authentication
 from fastapi import Depends
-from app.models.task.task_model import Task, TaskAssignee
+from app.models.task.task_model import Task
 from app.models.task.task_status_model import TaskStatus
 from app.models.user_model import User
-from datetime import datetime
+
 
 
 class FullUser(BaseModel):
@@ -22,11 +21,12 @@ class FullUser(BaseModel):
 class PageProject(BaseModel):
     project: Project
     team_members: list[FullUser]
-    team:Team = None
+    team: Team = None
+
 
 class FullTask(BaseModel):
-     task: Task
-     task_status:TaskStatus
+    task: Task
+    task_status: TaskStatus
 
 
 class DashboardPageResponse(BaseModel):
@@ -42,6 +42,13 @@ class CreateProject(BaseModel):
     team_id: int
     members_limit: int
     project_manager_id: int
+
+class ProjectsPageResponse(BaseModel):
+    projects: PageProject
+    tasks: list[FullTask]
+
+class oneProjectPageResponse(ProjectsPageResponse):
+    task_status: list[TaskStatus]|None
 
 
 class PagesRouter(BaseRouter[Project, CreateProject]):
@@ -63,6 +70,22 @@ class PagesRouter(BaseRouter[Project, CreateProject]):
             tags=["pages"],
             summary="Get user dashboard",
             response_description="User dashboard",
+        )
+        self.router.add_api_route(
+            path="/user_projects",
+            endpoint=self.user_projects,
+            methods=["GET"],
+            tags=["pages"],
+            summary="Get user projects",
+            response_description="User projects",
+        )
+        self.router.add_api_route(
+            path="/project_page/{project_id}",
+            endpoint=self.project_page,
+            methods=["GET"],
+            tags=["pages"],
+            summary="Get project page",
+            response_description="Project page",
         )
         super().setup_routes
 
@@ -92,6 +115,75 @@ class PagesRouter(BaseRouter[Project, CreateProject]):
                 )
                 for task in my_tasks
             ],
+        )
+
+    async def user_projects(
+        self,
+        user: User = Depends(authentication.get_current_user),
+    ) -> list[ProjectsPageResponse]:
+        my_teams = user.team_members
+        response: list[ProjectsPageResponse] = []
+        for team in my_teams:
+            for project in team.team.projects:
+                tasks = []
+                userTasks = self.controller.session.exec(
+                    select(Task).where(Task.project_id == project.id)
+                    ).all()
+                for task in userTasks:
+                    tasks.append(
+                        FullTask(
+                            task=task,
+                            task_status=task.task_status,
+                        )
+                    )
+                response.append(
+                    ProjectsPageResponse(
+                        projects=PageProject(
+                            project=project,
+                            team_members=[
+                                FullUser(
+                                    user=member.user,
+                                    profile=member.user.profile,
+                                    image_url=self.get_image_url(
+                                        member.user.profile.profile_image
+                                    ),
+                                )
+                                for member in project.team.team_members
+                            ],
+                            team=project.team,
+                        ),
+                        tasks=tasks,
+                    )
+                )
+        return response
+    
+    async def project_page(self, project_id:int, user: User = Depends(authentication.get_current_user))->oneProjectPageResponse:
+        project = self.controller.session.exec(select(Project).where(Project.id == project_id)).first()
+        tasks = self.controller.session.exec(select(Task).where(Task.project_id == project_id)).all()
+        statuses = self.controller.session.exec(select(TaskStatus)).all()
+        return oneProjectPageResponse(
+            projects=PageProject(
+                project=project,
+                team_members=[
+                    FullUser(
+                        user=member.user,
+                        profile=member.user.profile,
+                        image_url=self.get_image_url(
+                            member.user.profile.profile_image
+                        ),
+                    )
+                    for member in project.team.team_members
+                ],
+                team=project.team,
+            ),
+            tasks=[
+                FullTask(
+                    task=task,
+                    task_status=task.task_status,
+                )
+                for task in tasks
+            ],
+            task_status=statuses
         )
 
 
