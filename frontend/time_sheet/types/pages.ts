@@ -26,3 +26,13 @@ export type UserDashboardTypeResponse = {
      current_project?: ProjectBoxType;
      my_tasks?:FullTask[];
 }
+
+export type ProjectPageResponse = {
+     projects:{
+          project:ProjectType;
+          team_members:FullUserType[];
+          team:TeamType;
+     },
+     task_status:TaskStatus[];
+     tasks:FullTask[];
+}

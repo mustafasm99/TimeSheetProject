@@ -3,7 +3,7 @@ export interface ProjectType {
      update_time: string;
      team_id: number;
      start_time: string;
-     end_time: string | null;
+     end_time: string;
      members_counter: number | null;
      team_leader_id: number;
      project_manager_id: number;

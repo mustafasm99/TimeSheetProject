@@ -12,7 +12,8 @@ interface AppContextProps {
 const AppContext = createContext<AppContextProps | undefined>(undefined);
 
 export function AppWrapper({ children }: { children: React.ReactNode }) {
-  const [token, setToken] = useState<string | null>(localStorage.getItem("token"));
+  const StoredToken = localStorage.getItem("token");
+  const [token, setToken] = useState<string | null>(StoredToken);
   const [user, setUser] = useState<UserType | null>(null);
 
   useEffect(() => {

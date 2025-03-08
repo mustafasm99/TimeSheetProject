@@ -1,6 +1,7 @@
 import { FullTask, ProjectBoxType } from "@/types/pages";
 import { BookAIcon, BookMarked, Clock, ClockAlertIcon, ProjectorIcon, UsersRoundIcon } from "lucide-react";
 import config from "@/settings/configer";
+import TeamMembersHolder from "./team-members-holder";
 
 
 type ProjectBoxProp = {
@@ -66,17 +67,7 @@ export default function ProjectBox({ data , tasks }: ProjectBoxProp) {
      </div>
 
      <div className="flex flex-row gap-2 items-center justify-between w-full mt-2">
-          <div className="flex flex-row gap-0 items-start justify-start">
-               {
-                    data.team_members.map((member , index) => (
-                         <div key={member.user.id} className="flex flex-col gap-1 items-center justify-center">
-                              <img src={config().API_URL+member.image_url} alt="user" className={
-                                   ` ${index !== 0 ? "-left-5 z-20" : "z-10"} relative border-[6px] border-darkColor w-[50px] h-[50px] rounded-full object-cover`
-                              }/>
-                         </div>
-                    ))
-               }
-          </div>
+          <TeamMembersHolder team_members={data.team_members}/>
           <div className="flex flex-row gap-2 items-center justify-center bg-[#ff000025] px-5 py-4 rounded-lg">
                   <h1 className="text-white font-bold">
                          Due Date : {new Date(data.project.end_time ? new Date(data.project.end_time) : Date.now()).toLocaleDateString()}
