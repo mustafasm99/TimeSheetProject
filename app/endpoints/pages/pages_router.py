@@ -6,7 +6,7 @@ from pydantic import BaseModel
 from sqlmodel import select
 from app.controller.auth import authentication
 from fastapi import Depends
-from app.models.task.task_model import Task
+from app.models.task.task_model import Task , TaskAssignee
 from app.models.task.task_status_model import TaskStatus
 from app.models.user_model import User
 
@@ -87,6 +87,14 @@ class PagesRouter(BaseRouter[Project, CreateProject]):
             tags=["pages"],
             summary="Get project page",
             response_description="Project page",
+        )
+        self.router.add_api_route(
+            path="/my_tasks",
+            endpoint=self.my_task_page,
+            methods=["GET"],
+            tags=["pages"],
+            summary="Get my task page",
+            response_description="My task page",
         )
         super().setup_routes
 
@@ -196,6 +204,26 @@ class PagesRouter(BaseRouter[Project, CreateProject]):
             ],
             task_status=statuses,
         )
+    
+    async def my_task_page(self, user: User = Depends(authentication.get_current_user))->list[FullTask]:
+        tasks = self.controller.session.exec(select(TaskAssignee).where(TaskAssignee.assignee_id == user.id)).all()
+        return [
+            FullTask(
+                task=task.task,
+                task_status=task.task.task_status,
+                task_assignees=[
+                    FullUser(
+                        user=assignee.user,
+                        profile=assignee.user.profile,
+                        image_url=self.get_image_url(
+                            assignee.user.profile.profile_image
+                        ) if assignee.user and assignee.user.profile and assignee.user.profile.profile_image else None,
+                    )
+                    for assignee in task.task.task_assign
+                ] if task.task.task_assign else None
+            )
+            for task in tasks
+        ]
 
 
 page_router = PagesRouter()
