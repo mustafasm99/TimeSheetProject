@@ -14,8 +14,8 @@ from app.models.user_model import User
 
 class FullUser(BaseModel):
     user: User
-    profile: Profile
-    image_url: str = None
+    profile: Profile|None = None
+    image_url: str|None = None
 
 
 class PageProject(BaseModel):
@@ -27,6 +27,7 @@ class PageProject(BaseModel):
 class FullTask(BaseModel):
     task: Task
     task_status: TaskStatus
+    task_assignees: list[FullUser]|None = None
 
 
 class DashboardPageResponse(BaseModel):
@@ -180,10 +181,20 @@ class PagesRouter(BaseRouter[Project, CreateProject]):
                 FullTask(
                     task=task,
                     task_status=task.task_status,
+                    task_assignees=[
+                        FullUser(
+                            user=assignee.user,
+                            profile=assignee.user.profile,
+                            image_url=self.get_image_url(
+                                assignee.user.profile.profile_image
+                            ) if assignee.user and assignee.user.profile and assignee.user.profile.profile_image else None,
+                        )
+                        for assignee in task.task_assign
+                    ] if task.task_assign else None
                 )
                 for task in tasks
             ],
-            task_status=statuses
+            task_status=statuses,
         )
 
 

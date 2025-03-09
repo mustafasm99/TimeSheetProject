@@ -20,6 +20,7 @@ export type ProjectBoxType = {
 export type FullTask = {
      task:TaskType;
      task_status:TaskStatus;
+     task_assignees?:FullUserType[];
 }
 
 export type UserDashboardTypeResponse = {

@@ -86,13 +86,13 @@ export default function AppSidebar() {
             <span>Time Sheet</span>
           </div>
         </a>
-        <a href="projects" className={`block py-8 px-4 ${window.location.pathname === "/projects" ? "bg-red-500 bg-gradient-to-l from-red-900 rounded-xl to-transparent bg-opacity-10 text-red-500" : ""}`}>
+        <a href="/projects" className={`block py-8 px-4 ${window.location.pathname === "/projects" ? "bg-red-500 bg-gradient-to-l from-red-900 rounded-xl to-transparent bg-opacity-10 text-red-500" : ""}`}>
           <div className="flex justify-start">
             <Group className="mx-2" />
             <span>PROJECTS</span>
           </div>
         </a>
-        <a href="" className={`block py-8 px-4 ${window.location.pathname === "" ? "bg-red-500 bg-gradient-to-l from-red-900 rounded-xl to-transparent bg-opacity-10 text-red-500" : ""}`}>
+        <a href="/my-task" className={`block py-8 px-4 ${window.location.pathname === "/my-task" ? "bg-red-500 bg-gradient-to-l from-red-900 rounded-xl to-transparent bg-opacity-10 text-red-500" : ""}`}>
           <div className="flex justify-start">
             <Menu className="mx-2" />
             <span>MY TASK</span>
