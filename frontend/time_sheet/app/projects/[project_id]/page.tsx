@@ -5,6 +5,8 @@ import { getRequests } from "@/server/base/base_requests";
 import { useAppContext } from "@/context";
 import { ProjectPageResponse } from "@/types/pages";
 import { ProjectPageHeader } from "@/components/pages/project-page";
+import ProjectTaskFilterSection from "@/components/pages/project-task-filter";
+import ProjectTaskHolder from "@/components/pages/project-tasks-holders";
 
 
 export default function Page(){
@@ -30,6 +32,8 @@ export default function Page(){
           return (
                <div>
                     <ProjectPageHeader data={data}/>
+                    <ProjectTaskFilterSection data={data}/>
+                    <ProjectTaskHolder data={data}/>
                </div>
           )
      }

@@ -9,29 +9,34 @@ interface AppContextProps {
   setToken: (token: string) => void;
   user: UserType | null;
 }
+
 const AppContext = createContext<AppContextProps | undefined>(undefined);
 
 export function AppWrapper({ children }: { children: React.ReactNode }) {
-  const StoredToken = localStorage.getItem("token");
-  const [token, setToken] = useState<string | null>(StoredToken);
+  const [token, setToken] = useState<string | null>(null);
   const [user, setUser] = useState<UserType | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    setToken(storedToken);
-    const response = getRequests({
-      url: "user/me",
-      token: storedToken as string,
-    });
-    response.then((data: UserType) => {
-      if ( user == null) {
-        setUser(data);
+    if (typeof window !== "undefined") {
+      const storedToken = localStorage.getItem("token");
+      setToken(storedToken);
+      setLoading(false);
+
+      if (storedToken) {
+        getRequests({ url: "user/me", token: storedToken }).then((data: UserType) => {
+          setUser(data);
+        });
       }
-    });
-  }, [user]);
+    }
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>; // Prevents rendering before token is loaded
+  }
 
   return (
-    <AppContext.Provider value={{ token, setToken, user: user }}>
+    <AppContext.Provider value={{ token, setToken, user }}>
       {children}
     </AppContext.Provider>
   );
@@ -39,8 +44,8 @@ export function AppWrapper({ children }: { children: React.ReactNode }) {
 
 export function useAppContext() {
   const context = useContext(AppContext);
-  if (context === undefined) {
-    throw new Error("useAppContext must be used within a AppWrapper");
+  if (!context) {
+    throw new Error("useAppContext must be used within an AppWrapper");
   }
   return context;
 }
