@@ -98,7 +98,7 @@ export default function AppSidebar() {
             <span>MY TASK</span>
           </div>
         </a>
-        <a href="/time_sheet/submit" className={`block py-8 px-4 ${window.location.pathname === "/time_sheet/submit" ? "bg-red-500 bg-gradient-to-l from-red-900 rounded-xl to-transparent bg-opacity-10 text-red-500" : ""}`}>
+        <a href="/calendar" className={`block py-8 px-4 ${window.location.pathname === "/time_sheet/submit" ? "bg-red-500 bg-gradient-to-l from-red-900 rounded-xl to-transparent bg-opacity-10 text-red-500" : ""}`}>
           <div className="flex justify-start">
             <CalendarDays className="mx-2" />
             <span>CALENDAR</span>

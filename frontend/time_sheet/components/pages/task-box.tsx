@@ -21,7 +21,7 @@ export default function TaskBox(
   return (
     <div
       key={index}
-      className={`flex flex-col gap-2 items-start justify-start w-[280px] p-2 bg-widgetsColor rounded-lg`}
+      className={`flex flex-col gap-2 items-start justify-start w-[280px] p-2 bg-widgetsColor rounded-lg z-50`}
       style={{
         backgroundColor:
           task_colors[Math.floor(Math.random() * task_colors.length)],
