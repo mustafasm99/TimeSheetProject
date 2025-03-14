@@ -2,7 +2,7 @@
 
 import { useRouter, useParams } from "next/navigation";
 import { useQuery , useMutation } from "@tanstack/react-query";
-import { getRequests } from "@/server/base/base_requests";
+import { getRequests, putRequests } from "@/server/base/base_requests";
 import { useAppContext } from "@/context";
 import { TaskPageResponse } from "@/types/tasks";
 import { useState, useEffect } from "react";
@@ -45,6 +45,15 @@ export default function Page() {
     },
   });
 
+  const {mutate} = useMutation({
+     mutationKey: ["task_counter"],
+     mutationFn: async (data: {task_id:number , is_counting:boolean}) => {
+          return await putRequests({
+               url:`task_counter/${data.cur}`
+          })
+     },
+  });
+
   useEffect(() => {
     let interval: NodeJS.Timeout | null = null;
 
@@ -67,6 +76,8 @@ export default function Page() {
       .toString()
       .padStart(2, "0")}:${sec.toString().padStart(2, "0")}`;
   }
+
+
 
   if (!data) return null;
 

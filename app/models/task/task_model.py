@@ -72,6 +72,9 @@ class Task(SQLModel, table=True):
             ForeignKey("task_category.id", ondelete="SET NULL"),
         )
     )
+    
+    is_counting:bool = Field(sa_column=Column(Boolean, default=False))
+    
     task_status: Opt[TaskStatus] = Relationship(back_populates="task")
     task_update: list[TaskUpdate] = Relationship(back_populates="task")
     task_accountable: list["TaskAccountable"] = Relationship(back_populates="task")

@@ -44,18 +44,19 @@ class TaskCounterRouter(BaseRouter[TaskCounter, CreateTaskCounter]):
                raise HTTPException(status_code=400, detail="Creation failed")
           return result
      
-     async def update(self, id, data: UpdateCounterTime = Body(...) , user = Depends(authentication.get_current_user)):
+     async def update(self, id, data: UpdateCounterTime = Body(...) , user = Depends(authentication.get_current_user))->TaskCounter:
           old_counter:TaskCounter = await self.get_one(id)
           if not old_counter:
                raise HTTPException(status_code=404, detail="Counter not found")
-          if old_counter.task.user_id != user.id:
+          
+          if user.id not in [assign.assignee_id for assign in old_counter.task.task_assign]:
                raise HTTPException(status_code=403, detail="You are not allowed to update this counter")
+          
           user_tasks:list[TaskAssignee] = self.controller.session.exec(select(TaskAssignee).where(TaskAssignee.assignee_id == user.id)).all()
           for task in user_tasks:
-               if task.task.task_counter[0].is_counting:
-                    if task.task.task_counter[0].id == id and not data.is_counting:
-                         break
-                    raise HTTPException(status_code=400, detail="You can't stop this counter because you have another running counter")
+               if task.task.task_counter and task.task.task_counter[0].is_counting:
+                    if task.task.task_counter[0].id == id and data.is_counting:
+                         raise HTTPException(status_code=400, detail="You can't run this counter because you have another running counter")
                
                
           result = await super().update(id=id, data=CreateTaskCounter(
@@ -64,7 +65,7 @@ class TaskCounterRouter(BaseRouter[TaskCounter, CreateTaskCounter]):
                is_counting=data.is_counting,
                notes=old_counter.notes,
                start_time=old_counter.start_time,
-               task_id=old_counter.task
+               task_id=old_counter.task.id
           ))
           logging.info(f"Update result: {result}")
           if not result:
