@@ -5,7 +5,7 @@ from app.controller.base_controller import BaseController
 from pydantic import BaseModel
 from sqlmodel import select
 from app.controller.auth import authentication
-from fastapi import Depends, Path
+from fastapi import Depends, Path , HTTPException
 from app.models.task.task_model import Task, TaskAssignee
 from app.models.task.task_counter_model import TaskCounter
 from app.models.task.task_status_model import TaskStatus
@@ -56,6 +56,9 @@ class ProjectsPageResponse(BaseModel):
 class oneProjectPageResponse(ProjectsPageResponse):
     task_status: list[TaskStatus] | None
 
+class TaskUpdateState(BaseModel):
+    task_id:int
+    is_counting:bool
 
 class PagesRouter(BaseRouter[Project, CreateProject]):
     def __init__(self):
@@ -266,7 +269,12 @@ class PagesRouter(BaseRouter[Project, CreateProject]):
         task_id:int = Path(...)
     ) -> FullTask:
         task:Task = self.controller.session.exec(select(Task).where(Task.id == task_id)).first()
-        return FullTaskPage(
+        if not task:
+            raise HTTPException(status_code=404, detail="Task not found")
+        if user.id not in [assignee.assignee_id for assignee in task.task_assign]:
+            raise HTTPException(status_code=403, detail="You are not allowed to view this task")
+        
+        return FullTask(
                 task=task,
                 task_status=task.task_status,
                 task_assignees=[
@@ -286,5 +294,5 @@ class PagesRouter(BaseRouter[Project, CreateProject]):
                 if task.task_assign
                 else None,
             )
-
+    
 page_router = PagesRouter()

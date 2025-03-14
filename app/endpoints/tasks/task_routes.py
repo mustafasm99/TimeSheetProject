@@ -17,6 +17,7 @@ class CreateTask(BaseModel):
      end_time:datetime
      status_id:int
      category_id:int
+     is_counting:bool = False
 
 
 class CreateTaskForm(CreateTask):
@@ -56,7 +57,25 @@ class TaskRouter(BaseRouter[Task, CreateTask]):
           )
           return result
      
-     async def update(self, id, data: CreateTask = Body(...)):
+     async def update(self, id, data: CreateTask = Body(...) , user = Depends(authentication.get_current_user)):
+          old_task:Task = await self.get_one(id=id)
+          if not old_task:
+               raise HTTPException(status_code=404, detail="Task not found")
+          if user.id not in [assignee.assignee_id for assignee in old_task.task_assign]:
+               raise HTTPException(status_code=403, detail="You are not allowed to update this task")
+          
+          my_task = await self.task_me(user=user)
+          for task in my_task:
+               if int(task.id) != int(id):
+                    if task.is_counting:
+                         raise HTTPException(status_code=403, detail="You cant run this task you have another task running")
+               if task.id == id:
+                    if task.is_counting and not data.is_counting:
+                         raise HTTPException(status_code=403, detail="You cant stop a task that is not running")
+                    if not task.is_counting and data.is_counting:
+                         raise HTTPException(status_code=403, detail="You cant start a task that is running")
+               
+          
           result = await super().update(id=id, data=data)
           logging.info(f"Update result: {result}")
           if not result:

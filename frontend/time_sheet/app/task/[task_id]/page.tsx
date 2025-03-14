@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useParams } from "next/navigation";
-import { useQuery , useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { getRequests, putRequests } from "@/server/base/base_requests";
 import { useAppContext } from "@/context";
 import { TaskPageResponse } from "@/types/tasks";
@@ -10,12 +10,13 @@ import GetDateString from "@/components/util/return_date_string";
 import TeamMembersHolder from "@/components/pages/team-members-holder";
 import { PlayCircle, StopCircle } from "lucide-react";
 import { FullTask } from "@/types/pages";
+import { toast } from "react-hot-toast";
+
 
 export default function Page() {
   const router = useRouter();
   const [isCounting, setIsCounting] = useState(false);
   const [elapsedTime, setElapsedTime] = useState(0);
-  const [startTime, setStartTime] = useState<Date | null>(null);
   const { task_id } = useParams();
   const { token } = useAppContext();
 
@@ -26,33 +27,69 @@ export default function Page() {
         url: `pages/task/${task_id}`,
         token: token || "",
       });
-
+      setIsCounting(res.task.is_counting || false);
       const start = new Date(res.task.start_time);
       const end = res.task.end_time
         ? new Date(res.task.end_time)
-        : null;
+        : new Date(Date.now());
 
       // If the task is currently running, start from `start_time`
-      if (res.task.is_counting) {
-        setIsCounting(true);
-        setStartTime(start);
-        setElapsedTime(Math.floor((Date.now() - start.getTime()) / 1000));
-      } else if (end) {
-        // If task is stopped, count the total elapsed time until `end_time`
-        setIsCounting(false);
+      if (end) {
         setElapsedTime(Math.floor((end.getTime() - start.getTime()) / 1000));
       }
       return res;
     },
   });
 
-  const {mutate} = useMutation({
-     mutationKey: ["task_counter"],
-     mutationFn: async (data: {task_id:number , is_counting:boolean}) => {
-          return await putRequests({
-               url:`task/${task_id}`
-          })
+  const { mutate } = useMutation({
+    mutationKey: ["task_counter"],
+    mutationFn: async () => {
+      return await putRequests({
+        url: `task/${task_id}`,
+        token: token || "",
+        data: data
+          ? {
+              is_counting: isCounting,
+              title: data.task.title,
+              description: data.task.description,
+              start_time: data.task.start_time,
+              end_time: new Date().toISOString(),
+              status_id: data.task.status_id,
+              category_id: data.task.category_id,
+              project_id: data.task.project_id,
+            }
+          : {},
+      });
+    },
+     onMutate: () => {
+       setIsCounting(false);
+       toast.success(`Task < ${data?.task.title} > stopped successfully`);
      },
+  });
+  const { mutate: StartTask } = useMutation({
+    mutationKey: ["task_counter"],
+    mutationFn: async () => {
+      return await putRequests({
+        url: `task/${task_id}`,
+        token: token || "",
+        data: data
+          ? {
+              is_counting: isCounting,
+              title: data.task.title,
+              description: data.task.description,
+              start_time: new Date().toISOString(),
+              end_time: new Date().toISOString(),
+              status_id: data.task.status_id,
+              category_id: data.task.category_id,
+              project_id: data.task.project_id,
+            }
+          : {},
+      });
+    },
+    onMutate: () => {
+      setIsCounting(true);
+      toast.success(`Task < ${data?.task.title} > running successfully`);
+    },
   });
 
   useEffect(() => {
@@ -77,8 +114,6 @@ export default function Page() {
       .toString()
       .padStart(2, "0")}:${sec.toString().padStart(2, "0")}`;
   }
-
-
 
   if (!data) return null;
 
@@ -105,7 +140,14 @@ export default function Page() {
 
         <div className="flex flex-col w-full justify-center items-center">
           <button
-            onClick={() => setIsCounting(!isCounting)}
+            onClick={() => {
+              if (!isCounting) {
+                StartTask();
+              } else {
+                mutate();
+              }
+              
+            }}
             className="font-bold px-4 py-2 rounded-lg"
           >
             {isCounting ? (
