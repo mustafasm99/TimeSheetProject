@@ -80,12 +80,12 @@ export default function AppSidebar() {
           <span>Home</span>
           </div>
         </a>
-        <a href="/time_sheet" className={`block py-8 px-4 ${window.location.pathname === "/time_sheet" ? "bg-red-500 bg-gradient-to-l from-red-900 rounded-xl to-transparent bg-opacity-10 text-red-500" : ""}`}>
+        {/* <a href="/time_sheet" className={`block py-8 px-4 ${window.location.pathname === "/time_sheet" ? "bg-red-500 bg-gradient-to-l from-red-900 rounded-xl to-transparent bg-opacity-10 text-red-500" : ""}`}>
           <div className="flex justify-start">
             <TableOfContents className="mx-2" />
             <span>Time Sheet</span>
           </div>
-        </a>
+        </a> */}
         <a href="/projects" className={`block py-8 px-4 ${window.location.pathname === "/projects" ? "bg-red-500 bg-gradient-to-l from-red-900 rounded-xl to-transparent bg-opacity-10 text-red-500" : ""}`}>
           <div className="flex justify-start">
             <Group className="mx-2" />

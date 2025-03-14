@@ -58,6 +58,7 @@ class TaskCounter(SQLModel, table=True):
             onupdate=datetime.utcnow,
         )
     )
+    is_counting: bool = Field(sa_column=Column(Boolean, default=True))
     is_active: bool = Field(sa_column=Column(Boolean, default=True))
     task: "Task" = Relationship(back_populates="task_counter")
     counter_type: "TaskCounterType" = Relationship(back_populates="task_counter")

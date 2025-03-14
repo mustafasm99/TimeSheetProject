@@ -20,7 +20,7 @@ export default function Page(){
      })
      
      return (
-          <div className="flex flex-col gap-2 items-start justify-start w-full p-2 flex-wrap">
+          <div className="flex flex-row gap-2 items-start justify-start w-full p-2 flex-wrap">
                {
                     isLoading ? (
                          <h1>Loading...</h1>

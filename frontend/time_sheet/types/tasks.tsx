@@ -16,4 +16,4 @@ export const Task = z.object({
      project_id: z.number(),
 })
 
-export type TaskType = z.infer<typeof Task>
+export type TaskType = z.infer<typeof Task> & {id: number};

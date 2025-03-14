@@ -81,9 +81,9 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
         ) : (
           <SidebarProvider>
             <AppSidebar />
-            <main className="w-full">
+            <main className="w-full overflow-x-hidden">
               <SidebarTrigger />
-              <div className="flex flex-col flex-1 w-full px-2 ">
+              <div className="flex flex-col px-2 ">
                 <div className="flex flex-row justify-between w-full align-baseline items-center">
                   <div className="container search-holder w-full h-20 mx-5 rounded-md">
                     <div className="h-full relative">

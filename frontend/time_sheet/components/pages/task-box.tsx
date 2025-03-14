@@ -4,7 +4,7 @@ import { MoveRight } from "lucide-react";
 import TeamMembersHolder from "./team-members-holder";
 
 export default function TaskBox(
-     {task , index}:{task:FullTask , index:number}
+     {task , index , className}:{task:FullTask , index:number , className?:string}
 ) {
      const task_colors = [
           "#EF4444", // bg-red-500
@@ -15,13 +15,12 @@ export default function TaskBox(
           "#A855F7", // bg-purple-500
           "#6366F1", // bg-indigo-500
           "#6B7280", // bg-gray-500
-          "#4B5563", // bg-gray-700
           "00A793", // bg-teal-500
         ];
   return (
     <div
       key={index}
-      className={`flex flex-col gap-2 items-start justify-start w-[280px] p-2 bg-widgetsColor rounded-lg z-50`}
+      className={ className ? className : `flex flex-col gap-2 items-start justify-start w-[380px] p-2 bg-widgetsColor rounded-lg hover:z-999`}
       style={{
         backgroundColor:
           task_colors[Math.floor(Math.random() * task_colors.length)],
