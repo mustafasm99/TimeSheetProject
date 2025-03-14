@@ -9,6 +9,7 @@ import { useState, useEffect } from "react";
 import GetDateString from "@/components/util/return_date_string";
 import TeamMembersHolder from "@/components/pages/team-members-holder";
 import { PlayCircle, StopCircle } from "lucide-react";
+import { FullTask } from "@/types/pages";
 
 export default function Page() {
   const router = useRouter();
@@ -21,18 +22,18 @@ export default function Page() {
   const { data, isLoading, error } = useQuery({
     queryKey: ["task", task_id],
     queryFn: async () => {
-      const res: TaskPageResponse = await getRequests({
+      const res: FullTask = await getRequests({
         url: `pages/task/${task_id}`,
         token: token || "",
       });
 
-      const start = new Date(res.current_counter_time.start_time);
-      const end = res.current_counter_time.end_time
-        ? new Date(res.current_counter_time.end_time)
+      const start = new Date(res.task.start_time);
+      const end = res.task.end_time
+        ? new Date(res.task.end_time)
         : null;
 
       // If the task is currently running, start from `start_time`
-      if (res.current_counter_time.is_counting) {
+      if (res.task.is_counting) {
         setIsCounting(true);
         setStartTime(start);
         setElapsedTime(Math.floor((Date.now() - start.getTime()) / 1000));
@@ -49,7 +50,7 @@ export default function Page() {
      mutationKey: ["task_counter"],
      mutationFn: async (data: {task_id:number , is_counting:boolean}) => {
           return await putRequests({
-               url:`task_counter/${data.cur}`
+               url:`task/${task_id}`
           })
      },
   });

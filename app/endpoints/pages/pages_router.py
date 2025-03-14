@@ -264,7 +264,7 @@ class PagesRouter(BaseRouter[Project, CreateProject]):
         self,
         user: User = Depends(authentication.get_current_user),
         task_id:int = Path(...)
-    ) -> FullTaskPage:
+    ) -> FullTask:
         task:Task = self.controller.session.exec(select(Task).where(Task.id == task_id)).first()
         return FullTaskPage(
                 task=task,
@@ -285,8 +285,6 @@ class PagesRouter(BaseRouter[Project, CreateProject]):
                 ]
                 if task.task_assign
                 else None,
-                total_counter_time=(task.task_counter[0].end_time - task.task_counter[0].start_time).seconds if task.task_counter else 0,
-                current_counter_time=task.task_counter[0] if task.task_counter else None,
             )
 
 page_router = PagesRouter()

@@ -18,7 +18,7 @@ export const Task = z.object({
      project_id: z.number(),
 })
 
-export type TaskType = z.infer<typeof Task> & {id: number};
+export type TaskType = z.infer<typeof Task> & {id: number , is_counting?:boolean};
 export type TaskCounter = {
      id: number;
      task_id: number;
@@ -27,6 +27,7 @@ export type TaskCounter = {
      notes: string;
      is_counting: boolean;
      counter_type_id: number;
+
 }
 
 export type TaskPageResponse = {
