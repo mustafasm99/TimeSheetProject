@@ -2,6 +2,7 @@ import { FullTask } from "@/types/pages";
 import GetDateString from "../util/return_date_string";
 import { MoveRight } from "lucide-react";
 import TeamMembersHolder from "./team-members-holder";
+import { TaskPageResponse } from "@/types/tasks";
 
 export default function TaskBox(
      {task , index , className}:{task:FullTask , index:number , className?:string}

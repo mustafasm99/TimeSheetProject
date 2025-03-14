@@ -5,17 +5,17 @@ from app.controller.base_controller import BaseController
 from pydantic import BaseModel
 from sqlmodel import select
 from app.controller.auth import authentication
-from fastapi import Depends
-from app.models.task.task_model import Task , TaskAssignee
+from fastapi import Depends, Path
+from app.models.task.task_model import Task, TaskAssignee
+from app.models.task.task_counter_model import TaskCounter
 from app.models.task.task_status_model import TaskStatus
 from app.models.user_model import User
 
 
-
 class FullUser(BaseModel):
     user: User
-    profile: Profile|None = None
-    image_url: str|None = None
+    profile: Profile | None = None
+    image_url: str | None = None
 
 
 class PageProject(BaseModel):
@@ -27,8 +27,11 @@ class PageProject(BaseModel):
 class FullTask(BaseModel):
     task: Task
     task_status: TaskStatus
-    task_assignees: list[FullUser]|None = None
+    task_assignees: list[FullUser] | None = None
 
+class FullTaskPage(FullTask):
+    total_counter_time:int
+    current_counter_time:TaskCounter|None
 
 class DashboardPageResponse(BaseModel):
     current_project: PageProject
@@ -44,12 +47,14 @@ class CreateProject(BaseModel):
     members_limit: int
     project_manager_id: int
 
+
 class ProjectsPageResponse(BaseModel):
     projects: PageProject
     tasks: list[FullTask]
 
+
 class oneProjectPageResponse(ProjectsPageResponse):
-    task_status: list[TaskStatus]|None
+    task_status: list[TaskStatus] | None
 
 
 class PagesRouter(BaseRouter[Project, CreateProject]):
@@ -96,6 +101,16 @@ class PagesRouter(BaseRouter[Project, CreateProject]):
             summary="Get my task page",
             response_description="My task page",
         )
+        
+        self.router.add_api_route(
+            path="/task/{task_id}",
+            endpoint=self.task_page,
+            methods=["GET"],
+            tags=["pages"],
+            summary="Get task page",
+            response_description="Task page",
+        )
+        
         super().setup_routes
 
     async def user_dashboard(
@@ -137,7 +152,7 @@ class PagesRouter(BaseRouter[Project, CreateProject]):
                 tasks = []
                 userTasks = self.controller.session.exec(
                     select(Task).where(Task.project_id == project.id)
-                    ).all()
+                ).all()
                 for task in userTasks:
                     tasks.append(
                         FullTask(
@@ -165,10 +180,16 @@ class PagesRouter(BaseRouter[Project, CreateProject]):
                     )
                 )
         return response
-    
-    async def project_page(self, project_id:int, user: User = Depends(authentication.get_current_user))->oneProjectPageResponse:
-        project = self.controller.session.exec(select(Project).where(Project.id == project_id)).first()
-        tasks = self.controller.session.exec(select(Task).where(Task.project_id == project_id)).all()
+
+    async def project_page(
+        self, project_id: int, user: User = Depends(authentication.get_current_user)
+    ) -> oneProjectPageResponse:
+        project = self.controller.session.exec(
+            select(Project).where(Project.id == project_id)
+        ).first()
+        tasks = self.controller.session.exec(
+            select(Task).where(Task.project_id == project_id)
+        ).all()
         statuses = self.controller.session.exec(select(TaskStatus)).all()
         return oneProjectPageResponse(
             projects=PageProject(
@@ -177,9 +198,7 @@ class PagesRouter(BaseRouter[Project, CreateProject]):
                     FullUser(
                         user=member.user,
                         profile=member.user.profile,
-                        image_url=self.get_image_url(
-                            member.user.profile.profile_image
-                        ),
+                        image_url=self.get_image_url(member.user.profile.profile_image),
                     )
                     for member in project.team.team_members
                 ],
@@ -195,18 +214,28 @@ class PagesRouter(BaseRouter[Project, CreateProject]):
                             profile=assignee.user.profile,
                             image_url=self.get_image_url(
                                 assignee.user.profile.profile_image
-                            ) if assignee.user and assignee.user.profile and assignee.user.profile.profile_image else None,
+                            )
+                            if assignee.user
+                            and assignee.user.profile
+                            and assignee.user.profile.profile_image
+                            else None,
                         )
                         for assignee in task.task_assign
-                    ] if task.task_assign else None
+                    ]
+                    if task.task_assign
+                    else None,
                 )
                 for task in tasks
             ],
             task_status=statuses,
         )
-    
-    async def my_task_page(self, user: User = Depends(authentication.get_current_user))->list[FullTask]:
-        tasks = self.controller.session.exec(select(TaskAssignee).where(TaskAssignee.assignee_id == user.id)).all()
+
+    async def my_task_page(
+        self, user: User = Depends(authentication.get_current_user)
+    ) -> list[FullTask]:
+        tasks = self.controller.session.exec(
+            select(TaskAssignee).where(TaskAssignee.assignee_id == user.id)
+        ).all()
         return [
             FullTask(
                 task=task.task,
@@ -217,13 +246,47 @@ class PagesRouter(BaseRouter[Project, CreateProject]):
                         profile=assignee.user.profile,
                         image_url=self.get_image_url(
                             assignee.user.profile.profile_image
-                        ) if assignee.user and assignee.user.profile and assignee.user.profile.profile_image else None,
+                        )
+                        if assignee.user
+                        and assignee.user.profile
+                        and assignee.user.profile.profile_image
+                        else None,
                     )
                     for assignee in task.task.task_assign
-                ] if task.task.task_assign else None
+                ]
+                if task.task.task_assign
+                else None,
             )
             for task in tasks
         ]
 
+    async def task_page(
+        self,
+        user: User = Depends(authentication.get_current_user),
+        task_id:int = Path(...)
+    ) -> FullTaskPage:
+        task:Task = self.controller.session.exec(select(Task).where(Task.id == task_id)).first()
+        return FullTaskPage(
+                task=task,
+                task_status=task.task_status,
+                task_assignees=[
+                    FullUser(
+                        user=assignee.user,
+                        profile=assignee.user.profile,
+                        image_url=self.get_image_url(
+                            assignee.user.profile.profile_image
+                        )
+                        if assignee.user
+                        and assignee.user.profile
+                        and assignee.user.profile.profile_image
+                        else None,
+                    )
+                    for assignee in task.task_assign
+                ]
+                if task.task_assign
+                else None,
+                total_counter_time=(task.task_counter[0].end_time - task.task_counter[0].start_time).seconds if task.task_counter else 0,
+                current_counter_time=task.task_counter[0] if task.task_counter else None,
+            )
 
 page_router = PagesRouter()
