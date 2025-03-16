@@ -1,13 +1,78 @@
 import { GetMyProfile } from "@/server/profile/get_me";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { useAppSelector } from "@/app/redux/store";
+import { Bell, PlayCircle, StopCircle } from "lucide-react";
+import { putRequests } from "@/server/base/base_requests";
+import { FullTask } from "@/types/pages";
+import toast from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { incrementCounter, setTask, startCounting, stopeCounting } from "@/app/redux/features/current-task";
+import { formatTime } from "@/util/timer";
+import { useEffect, useRef } from "react";
+import { usePathname } from "next/navigation"
 
-import { Bell } from "lucide-react";
 
 export default function ProfileHolder() {
+  const pathname = usePathname();
   const { data, error, isLoading } = useQuery({
     queryKey: ["profile"],
     queryFn: () => GetMyProfile(localStorage.getItem("token") as string),
   });
+  const dispatch = useDispatch();
+  const { mutate } = useMutation({
+    mutationKey: ["task_counter"],
+    mutationFn: async ({
+      task_id,
+      data,
+    }: {
+      task_id: number;
+      data: FullTask;
+    }) => {
+      const token = localStorage.getItem("token");
+      return await putRequests({
+        url: `task/${task_id}`,
+        token: token || "",
+        data: data
+          ? {
+              is_counting: data.task.is_counting,
+              title: data.task.title,
+              description: data.task.description,
+              start_time: data.task.start_time,
+              end_time: new Date().toISOString(),
+              status_id: data.task.status_id,
+              category_id: data.task.category_id,
+              project_id: data.task.project_id,
+            }
+          : {},
+      });
+    },
+    onMutate: ({ data }) => {
+      toast.success(`Task < ${data.task.title} > ${data.task.is_counting ? "starting" : "stopping"} successfully`);
+    },
+  });
+
+  const currentTask = useAppSelector((state) => state.CurrentTaskReducer);
+  let intervalRef = useRef<NodeJS.Timeout | null>(null);
+  useEffect(() => {
+      if (currentTask.task.is_counting && !pathname.includes("task")) {
+        intervalRef.current = setInterval(() => {
+          dispatch(incrementCounter((prev) => prev + 1));
+        }, 1000);
+      } else {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+        }
+      }
+  
+      return () => {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current);
+          intervalRef.current = null;
+        }
+      };
+    }, [currentTask.task.is_counting, dispatch]);
+
   return (
     <div className="container p-3 flex-grow bg-mainColor rounded-lg">
       {isLoading && (
@@ -33,16 +98,55 @@ export default function ProfileHolder() {
       )}
       {data && (
         <div className="flex flex-row justify">
-          <div className="text-bold text-center text-white flex flex-col flex-1 w-[fit-content]">
-            <h1>{data.user.name}</h1>
-
-            <p>no current task</p>
+          <div className="text-bold text-center text-white flex flex-col flex-1 w-fit gap-1 justify-start items-start">
+            {currentTask.task.id !== 0 ? (
+              <div className="flex flex-col gap-1 w-fit justify-start items-start">
+                <p>{currentTask.task.title}</p>
+                <div className="flex flex-row gap-2 justify-start items-center">
+                  <p className="font-bold text-white bg-green-950 px-1  rounded-lg">
+                    {formatTime(currentTask.currentCounter)}
+                  </p>
+                  {currentTask.task.is_counting ? (
+                    <button
+                      onClick={() => {
+                        dispatch(stopeCounting());
+                        mutate(
+                          {
+                            task_id: currentTask.task.id,
+                            data: currentTask,
+                          }
+                        );
+                      }}
+                      className="font-bold px-4 py-2 rounded-lg"
+                    >
+                      <StopCircle className="h-5 w-5" />
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => {
+                        dispatch(startCounting());
+                        mutate(
+                          {
+                            task_id: currentTask.task.id,
+                            data: currentTask,
+                          }
+                        );
+                      }}
+                      className="font-bold px-4 py-2 rounded-lg"
+                    >
+                      <PlayCircle className="h-5 w-5" />
+                    </button>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <p>no current task</p>
+            )}
           </div>
 
           <button className="mx-4 my-2 ">
             <Bell className="w-6 h-6 text-white" />
           </button>
-
 
           {/* the image here  */}
           <div className="relative group">
@@ -64,8 +168,6 @@ export default function ProfileHolder() {
               </ul>
             </div>
           </div>
-
-          
         </div>
       )}
     </div>

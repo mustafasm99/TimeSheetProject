@@ -18,7 +18,8 @@ import CreateTaskForm, {
 } from "@/components/tasks/create_tasks";
 
 import { Provider } from "react-redux";
-import { store } from "./redux/store";
+import { persistor, store } from "./redux/store";
+import { PersistGate } from "redux-persist/integration/react";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -46,6 +47,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased h-full center`}
       >
         <Provider store={store}>
+          <PersistGate loading={null} persistor={persistor}>
           <ThemeProvider
             attribute={"class"}
             defaultTheme="system"
@@ -56,10 +58,13 @@ export default function RootLayout({
             {/* AppWrapper should wrap the entire layout */}
             <AppWrapper>
               <LayoutContent>
-                <main className="mx-5 my-2">{children}</main>
+                <main className="mx-5 my-2">
+                  {children}
+                </main>
               </LayoutContent>
             </AppWrapper>
           </ThemeProvider>
+          </PersistGate>
         </Provider>
       </body>
     </html>

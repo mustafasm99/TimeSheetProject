@@ -4,21 +4,28 @@ import { useRouter, useParams } from "next/navigation";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { getRequests, putRequests } from "@/server/base/base_requests";
 import { useAppContext } from "@/context";
-import { TaskPageResponse } from "@/types/tasks";
-import { useState, useEffect } from "react";
+import { useRef, useEffect } from "react";
 import GetDateString from "@/components/util/return_date_string";
 import TeamMembersHolder from "@/components/pages/team-members-holder";
 import { PlayCircle, StopCircle } from "lucide-react";
 import { FullTask } from "@/types/pages";
 import { toast } from "react-hot-toast";
-
+import { useDispatch } from "react-redux";
+import {
+  setTask,
+  startCounting,
+  stopeCounting,
+  setCounterTime,
+  incrementCounter,
+} from "@/app/redux/features/current-task";
+import { useAppSelector } from "@/app/redux/store";
+import { formatTime } from "@/util/timer";
 
 export default function Page() {
-  const router = useRouter();
-  const [isCounting, setIsCounting] = useState(false);
-  const [elapsedTime, setElapsedTime] = useState(0);
+  const dispatch = useDispatch();
   const { task_id } = useParams();
   const { token } = useAppContext();
+  const currentTask = useAppSelector((state) => state.CurrentTaskReducer);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["task", task_id],
@@ -27,15 +34,20 @@ export default function Page() {
         url: `pages/task/${task_id}`,
         token: token || "",
       });
-      setIsCounting(res.task.is_counting || false);
       const start = new Date(res.task.start_time);
       const end = res.task.end_time
         ? new Date(res.task.end_time)
         : new Date(Date.now());
 
       // If the task is currently running, start from `start_time`
+      dispatch(setTask(res));
       if (end) {
-        setElapsedTime(Math.floor((end.getTime() - start.getTime()) / 1000));
+        console.log("end :");
+        dispatch(
+          setCounterTime(
+            Math.floor((end.getTime() - start.getTime()) / 1000) || 0
+          )
+        );
       }
       return res;
     },
@@ -49,7 +61,7 @@ export default function Page() {
         token: token || "",
         data: data
           ? {
-              is_counting: isCounting,
+              is_counting: currentTask.task.is_counting,
               title: data.task.title,
               description: data.task.description,
               start_time: data.task.start_time,
@@ -61,10 +73,10 @@ export default function Page() {
           : {},
       });
     },
-     onMutate: () => {
-       setIsCounting(false);
-       toast.success(`Task < ${data?.task.title} > stopped successfully`);
-     },
+    onMutate: () => {
+      dispatch(stopeCounting());
+      toast.success(`Task < ${data?.task.title} > stopped successfully`);
+    },
   });
   const { mutate: StartTask } = useMutation({
     mutationKey: ["task_counter"],
@@ -74,7 +86,7 @@ export default function Page() {
         token: token || "",
         data: data
           ? {
-              is_counting: isCounting,
+              is_counting: currentTask.task.is_counting,
               title: data.task.title,
               description: data.task.description,
               start_time: new Date().toISOString(),
@@ -87,36 +99,32 @@ export default function Page() {
       });
     },
     onMutate: () => {
-      setIsCounting(true);
+      dispatch(startCounting());
       toast.success(`Task < ${data?.task.title} > running successfully`);
     },
   });
-
+  let intervalRef = useRef<NodeJS.Timeout | null>(null);
   useEffect(() => {
-    let interval: NodeJS.Timeout | null = null;
-
-    if (isCounting) {
-      interval = setInterval(() => {
-        setElapsedTime((prevElapsed) => prevElapsed + 1);
+    if (currentTask.task.is_counting) {
+      intervalRef.current = setInterval(() => {
+        dispatch(incrementCounter((prev) => prev + 1));
       }, 1000);
+    } else {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
     }
 
     return () => {
-      if (interval) clearInterval(interval);
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
     };
-  }, [isCounting]);
-
-  function formatTime(seconds: number) {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    const sec = seconds % 60;
-    return `${hours.toString().padStart(2, "0")}:${minutes
-      .toString()
-      .padStart(2, "0")}:${sec.toString().padStart(2, "0")}`;
-  }
+  }, [currentTask.task.is_counting, dispatch]);
 
   if (!data) return null;
-
   return (
     <div className="flex flex-col justify-center items-center min-h-[700px]">
       <div className="min-w-[500px] min-h-[500px] bg-blue-900 rounded-lg shadow-md p-4 flex flex-col gap-2 items-center justify-around">
@@ -141,22 +149,21 @@ export default function Page() {
         <div className="flex flex-col w-full justify-center items-center">
           <button
             onClick={() => {
-              if (!isCounting) {
+              if (!currentTask.task.is_counting) {
                 StartTask();
               } else {
                 mutate();
               }
-              
             }}
             className="font-bold px-4 py-2 rounded-lg"
           >
-            {isCounting ? (
-              <StopCircle size="lg" className="h-20 w-20" />
+            {currentTask.task.is_counting ? (
+              <StopCircle className="h-20 w-20" />
             ) : (
-              <PlayCircle size="lg" className="h-20 w-20" />
+              <PlayCircle className="h-20 w-20" />
             )}
           </button>
-          <h1>{formatTime(elapsedTime)}</h1>
+          <h1>{formatTime(currentTask.currentCounter)}</h1>
         </div>
 
         <div className="flex flex-row gap-2 items-center justify-between w-full">
