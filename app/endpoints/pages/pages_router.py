@@ -273,9 +273,9 @@ class PagesRouter(BaseRouter[Project, CreateProject]):
             raise HTTPException(status_code=404, detail="Task not found")
         if user.id not in [assignee.assignee_id for assignee in task.task_assign]:
             raise HTTPException(status_code=403, detail="You are not allowed to view this task")
-        
+        print(task.is_counting)
         return FullTask(
-                task=task,
+                task=task.model_dump(),
                 task_status=task.task_status,
                 task_assignees=[
                     FullUser(
