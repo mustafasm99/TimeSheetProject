@@ -5,8 +5,7 @@ from app.controller.auth import authentication
 from app.controller.base_controller import BaseController
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
-from jose import JWTError, jwt
-from datetime import datetime, timedelta
+from app.qr import qr
 from fastapi.responses import FileResponse
 import os
 
@@ -50,13 +49,13 @@ class AttendanceRouter(BaseRouter[Attendance , CreateAttendance]):
           return attendance
      
      async def get_token(self, user: User = Depends(authentication.get_current_user)):
-          import qrcode
-          token = jwt.encode({"sub": user.id, "exp": datetime.utcnow() + timedelta(minutes=30)}, "secret-key-to-attendance", algorithm="HS256")
-          qr = qrcode.make(token)
+
+          
           
           # Save the QR code to a temporary file
           qr_file_path = "/tmp/attendance_qr.png"
-          qr.save(qr_file_path)
+          qr.create_token(user.id)
+          qr.get_new_qr()
           
           # Return the file as a response and delete it after use
           response = FileResponse(qr_file_path, media_type="image/png", filename="attendance_qr.png")
