@@ -5,17 +5,24 @@ import { useQuery } from "@tanstack/react-query"
 import { useAppContext } from "@/context"
 import { FullTask } from "@/types/pages"
 import TaskBox from "@/components/pages/task-box"
+import { useDispatch } from "react-redux"
+import { setTasks   } from "@/app/redux/features/my-tasks"
+import { useAppSelector } from "../redux/store"
+
 
 export default function Page(){
      const {token} = useAppContext()
+     const dispatch = useDispatch()
+     const tasks = useAppSelector(state => state.MyTasksReducer.tasks)
      const {data , isLoading, isError} = useQuery({
           queryKey:["my_tasks"],
           queryFn: async () => {
-               const res = await getRequests({
+               const res:FullTask[] = await getRequests({
                     url: `pages/my_tasks`,
                     token:token || "",
                })
-               return res as FullTask[]
+               dispatch(setTasks(res))
+               return res
           }
      })
      
@@ -26,8 +33,8 @@ export default function Page(){
                          <h1>Loading...</h1>
                     ) : isError ? (
                          <h1>Error...</h1>
-                    ) : data && (
-                         data.map((task , index) => (
+                    ) : tasks && (
+                         tasks.map((task , index) => (
                               <TaskBox key={index} task={task} index={index} />
                          ))
                     )

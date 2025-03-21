@@ -59,9 +59,10 @@ export default function TaskBox({
 
       <div className="flex flex-row gap-2 items-center justify-between w-full">
         <h3 className="text-md font-bold capitalize text-black">
-          {task.task_status.status}
+          {task.task_status?.status}
         </h3>
         <TeamMembersHolder
+          key={index}
           showMembers={2}
           team_members={task.task_assignees || []}
         />

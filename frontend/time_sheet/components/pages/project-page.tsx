@@ -54,7 +54,9 @@ export function ProjectPageHeader(data: { data: ProjectPageResponse }) {
               </h1>
             </div>
             <p>members :</p>
-            <TeamMembersHolder team_members={data.data.projects.team_members} />
+            <TeamMembersHolder 
+            key={data.data.projects.project.id}
+            team_members={data.data.projects.team_members} />
           </div>
         </div>
       </div>

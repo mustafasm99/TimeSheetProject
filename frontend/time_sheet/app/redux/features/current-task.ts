@@ -1,4 +1,4 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { createSlice, current } from '@reduxjs/toolkit';
 import { FullTask } from '@/types/pages';
 
 const initialState: FullTask & { currentCounter: number } = {
@@ -13,6 +13,7 @@ const initialState: FullTask & { currentCounter: number } = {
         project_id: 0,
         id: 0,
         is_counting: false,
+        work_time: 0
     },
     task_status: {
         id: 0,
@@ -30,6 +31,7 @@ const currentTaskSlice = createSlice({
     initialState,
     reducers: {
         setTask: (state, action: { payload: FullTask }) => {
+            console.log(action.payload , "current task has been set");
             state.task = {
                 ...action.payload.task,
                 start_time: action.payload.task.start_time 
@@ -41,6 +43,7 @@ const currentTaskSlice = createSlice({
             };
             state.task_status = action.payload.task_status;
             state.task_assignees = action.payload.task_assignees || [];
+            state.currentCounter = action.payload.task.work_time || 0;
         },
         setStatus: (state, action) => {
             state.task_status = action.payload;
@@ -64,6 +67,12 @@ const currentTaskSlice = createSlice({
         },
         incrementCounter: (state, action: { payload: (prev: number) => number }) => {
             state.currentCounter = action.payload(state.currentCounter);
+        },
+        clearTask: (state) => {
+            state.task = initialState.task;
+            state.task_status = initialState.task_status;
+            state.task_assignees = initialState.task_assignees;
+            state.currentCounter = initialState.currentCounter;
         }
     }
 });
@@ -76,7 +85,8 @@ export const {
     startCounting, 
     stopeCounting, 
     setCounterTime, 
-    incrementCounter 
+    incrementCounter,
+    clearTask,
 } = currentTaskSlice.actions;
 
 export default currentTaskSlice.reducer;

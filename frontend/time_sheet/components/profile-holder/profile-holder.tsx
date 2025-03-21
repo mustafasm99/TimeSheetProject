@@ -2,18 +2,21 @@ import { GetMyProfile } from "@/server/profile/get_me";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useAppSelector } from "@/app/redux/store";
 import { Bell, PlayCircle, StopCircle } from "lucide-react";
-import { putRequests } from "@/server/base/base_requests";
+import { getRequests, putRequests } from "@/server/base/base_requests";
 import { FullTask } from "@/types/pages";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
-import { incrementCounter, setTask, startCounting, stopeCounting } from "@/app/redux/features/current-task";
+import { incrementCounter, setTask, startCounting, stopeCounting , clearTask } from "@/app/redux/features/current-task";
 import { formatTime } from "@/util/timer";
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation"
+import { useAppContext } from "@/context";
+
 
 
 export default function ProfileHolder() {
   const pathname = usePathname();
+  const { token } = useAppContext();
   const { data, error, isLoading } = useQuery({
     queryKey: ["profile"],
     queryFn: () => GetMyProfile(localStorage.getItem("token") as string),
@@ -50,7 +53,20 @@ export default function ProfileHolder() {
       toast.success(`Task < ${data.task.title} > ${data.task.is_counting ? "starting" : "stopping"} successfully`);
     },
   });
-
+  const { error:noCounter } =useQuery({
+    queryKey: ["current_task"],
+    queryFn: async() => {
+      const response = await getRequests({
+        url: "task/current",
+        token: token || "",
+      });
+      dispatch(setTask(response as FullTask));
+      return response;
+    },
+  })
+  if(noCounter && !pathname.includes("task")){
+   dispatch(clearTask());
+  }
   const currentTask = useAppSelector((state) => state.CurrentTaskReducer);
   let intervalRef = useRef<NodeJS.Timeout | null>(null);
   useEffect(() => {
@@ -119,7 +135,7 @@ export default function ProfileHolder() {
                       }}
                       className="font-bold px-4 py-2 rounded-lg"
                     >
-                      <StopCircle className="h-5 w-5" />
+                      <PlayCircle className="h-5 w-5" />
                     </button>
                   ) : (
                     <button
@@ -134,7 +150,7 @@ export default function ProfileHolder() {
                       }}
                       className="font-bold px-4 py-2 rounded-lg"
                     >
-                      <PlayCircle className="h-5 w-5" />
+                      <StopCircle className="h-5 w-5" />
                     </button>
                   )}
                 </div>

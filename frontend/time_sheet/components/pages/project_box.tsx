@@ -67,7 +67,7 @@ export default function ProjectBox({ data , tasks }: ProjectBoxProp) {
      </div>
 
      <div className="flex flex-row gap-2 items-center justify-between w-full mt-2">
-          <TeamMembersHolder team_members={data.team_members}/>
+          <TeamMembersHolder key={1} team_members={data.team_members}/>
           <div className="flex flex-row gap-2 items-center justify-center bg-[#ff000025] px-5 py-4 rounded-lg">
                   <h1 className="text-white font-bold">
                          Due Date : {new Date(data.project.end_time ? new Date(data.project.end_time) : Date.now()).toLocaleDateString()}

@@ -4,7 +4,7 @@ import { useRouter, useParams } from "next/navigation";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { getRequests, putRequests } from "@/server/base/base_requests";
 import { useAppContext } from "@/context";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import GetDateString from "@/components/util/return_date_string";
 import TeamMembersHolder from "@/components/pages/team-members-holder";
 import { PlayCircle, StopCircle } from "lucide-react";
@@ -20,13 +20,34 @@ import {
 } from "@/app/redux/features/current-task";
 import { useAppSelector } from "@/app/redux/store";
 import { formatTime } from "@/util/timer";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { TaskStatus } from "@/types/states/tasks";
 
 export default function Page() {
   const dispatch = useDispatch();
   const { task_id } = useParams();
   const { token } = useAppContext();
   const currentTask = useAppSelector((state) => state.CurrentTaskReducer);
-
+  const [taskStatusId , setTaskStatusId] = useState<string>("");
+  
+  const {data:taskStatus , error:statusError , isLoading:loadingStatus} = useQuery({
+    queryKey: ["task_status"],
+    queryFn: async() => {
+      const response = await getRequests({
+        url: "task_status",
+        token: token || "",
+      });
+      return response as TaskStatus[];
+    }
+  })
   const { data, isLoading, error } = useQuery({
     queryKey: ["task", task_id],
     queryFn: async () => {
@@ -38,17 +59,8 @@ export default function Page() {
       const end = res.task.end_time
         ? new Date(res.task.end_time)
         : new Date(Date.now());
-
-      // If the task is currently running, start from `start_time`
       dispatch(setTask(res));
-      if (end) {
-        console.log("end :");
-        dispatch(
-          setCounterTime(
-            Math.floor((end.getTime() - start.getTime()) / 1000) || 0
-          )
-        );
-      }
+      setTaskStatusId(res.task.status_id.toString());
       return res;
     },
   });
@@ -66,7 +78,7 @@ export default function Page() {
               description: data.task.description,
               start_time: data.task.start_time,
               end_time: new Date().toISOString(),
-              status_id: data.task.status_id,
+              status_id: taskStatusId != "" ? parseInt(taskStatusId) : data.task.status_id,
               category_id: data.task.category_id,
               project_id: data.task.project_id,
             }
@@ -86,7 +98,7 @@ export default function Page() {
         token: token || "",
         data: data
           ? {
-              is_counting: currentTask.task.is_counting,
+              is_counting: true,
               title: data.task.title,
               description: data.task.description,
               start_time: new Date().toISOString(),
@@ -168,9 +180,35 @@ export default function Page() {
 
         <div className="flex flex-row gap-2 items-center justify-between w-full">
           <h3 className="text-md font-bold capitalize text-black">
-            {data.task_status.status}
+            <Select
+              onValueChange={(value) => {
+                setTaskStatusId(value);
+                dispatch(
+                  setTask({
+                    ...data,
+                    task: { ...data.task, status_id: parseInt(value) },
+                  })
+                );
+                mutate();
+                toast.success(`Task < ${data?.task.title} > status updated`);
+              }}
+            >
+              <SelectTrigger className="bg-transparent border-none text-white">
+                <SelectValue placeholder={loadingStatus?"loading ...":data.task_status.status } />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectGroup>
+                  {taskStatus?.map((status) => (
+                    <SelectItem key={status.id} value={status.status}>
+                      {status.status}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
           </h3>
           <TeamMembersHolder
+            key={data.task.id}
             showMembers={4}
             team_members={data.task_assignees || []}
           />

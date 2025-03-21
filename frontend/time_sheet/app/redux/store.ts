@@ -5,9 +5,11 @@ import { combineReducers } from "redux";
 import storage from "redux-persist/lib/storage"; // Use localStorage
 import { FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER } from "redux-persist";
 
+
 import AdminStore from "./features/admin-site";
 import TaskStore from "./features/tasks-sites";
 import CurrentTaskReducer from "./features/current-task";
+import MyTasksReducer from "./features/my-tasks";
 
 // Persist Config
 const persistConfig = {
@@ -21,6 +23,7 @@ const rootReducer = combineReducers({
   AdminStore,
   TaskStore,
   CurrentTaskReducer,
+  MyTasksReducer,
 });
 
 // Apply persistReducer to the entire rootReducer

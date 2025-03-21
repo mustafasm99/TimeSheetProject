@@ -1,10 +1,6 @@
 import { ProjectPageResponse } from "@/types/pages";
 import { ScrollArea, ScrollBar } from "../ui/scroll-area";
-import GetDateString from "../util/return_date_string";
-import { MoveLeft, MoveRight } from "lucide-react";
-import TeamMembersHolder from "./team-members-holder";
 import TaskBox from "./task-box";
-
 export default function ProjectTaskHolder({
   data,
 }: {

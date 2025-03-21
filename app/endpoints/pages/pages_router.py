@@ -26,7 +26,7 @@ class PageProject(BaseModel):
 
 class FullTask(BaseModel):
     task: Task
-    task_status: TaskStatus
+    task_status: TaskStatus|None
     task_assignees: list[FullUser] | None = None
 
 class FullTaskPage(FullTask):

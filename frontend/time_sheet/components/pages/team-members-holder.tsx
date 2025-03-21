@@ -14,7 +14,7 @@ export default function TeamMembersHolder({
       {team_members.length < showMembers
         ? team_members.map((member, index) => (
             <div
-              key={member.user.id}
+              key={index}
               className="flex flex-col gap-1 items-center justify-center"
             >
               <img
