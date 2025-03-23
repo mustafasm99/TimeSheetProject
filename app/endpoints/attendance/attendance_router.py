@@ -7,7 +7,13 @@ from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from app.qr import qr
 from fastapi.responses import FileResponse
-import os
+from fastapi import Path , File
+from app.core.conf import settings
+import uuid
+from sqlmodel import select , func
+from datetime import datetime
+
+
 
 class CreateAttendance(BaseModel):
     token:str
@@ -21,7 +27,6 @@ class AttendanceRouter(BaseRouter[Attendance , CreateAttendance]):
                # auth_object=[authentication.get_current_user],
                create_type=CreateAttendance,
                controller=BaseController(Attendance)
-               
           )
      
      def setup_routes(self):
@@ -30,7 +35,19 @@ class AttendanceRouter(BaseRouter[Attendance , CreateAttendance]):
                endpoint=self.get_token,
                methods=["GET"],
           )
+          self.router.add_api_route(
+               path="/read-token/{token}",
+               endpoint=self.attendance,
+               methods=["GET"],
+          )
+          self.router.add_api_route(
+               path="/today",
+               endpoint=self.today_attendance,
+               methods=["GET"],
+          )
           return super().setup_routes()
+     
+     
      
      async def create(self, attendance:CreateAttendance, user:User=Depends(authentication.get_current_user)):
           attendance = Attendance(
@@ -48,25 +65,47 @@ class AttendanceRouter(BaseRouter[Attendance , CreateAttendance]):
           await super().update(attendance)
           return attendance
      
-     async def get_token(self, user: User = Depends(authentication.get_current_user)):
-
-          
-          
+     async def get_token(self, user: User = Depends(authentication.get_current_user))->FileResponse:          
           # Save the QR code to a temporary file
-          qr_file_path = "/tmp/attendance_qr.png"
+          qr_file_path = settings.MEDIA_PATH + f"/qr/{uuid.uuid4()}.png"
           qr.create_token(user.id)
-          qr.get_new_qr()
+          qr.get_new_qr().save(qr_file_path)
           
           # Return the file as a response and delete it after use
           response = FileResponse(qr_file_path, media_type="image/png", filename="attendance_qr.png")
           response.headers["X-Delete-File"] = "true"
           
-          @response.background
-          async def cleanup():
-               if os.path.exists(qr_file_path):
-                    os.remove(qr_file_path)
           
           return response
+     
+     async def attendance(self, token:str = Path(), user:User=Depends(authentication.get_current_user),):
+          try:
+               old_attendance = await self.get_by_field("token", token)
+               if old_attendance:
+                    raise HTTPException(status_code=400, detail="Attendance already marked")
+               token_data = qr.decode_token(token)
+               
+               if token_data["sub"] != str(user.id):
+                    raise HTTPException(status_code=403, detail="Invalid token")
+               attendance = Attendance(
+                    user_id = user.id,
+                    token = token
+               )
+               await super().create(attendance)
+               return attendance
+          except:
+               raise HTTPException(status_code=400, detail="Invalid token")
+     
+     async def today_attendance(self, user:User=Depends(authentication.get_current_user))->Attendance|None:
+          attendance = self.controller.session.exec(
+               select(
+                    Attendance
+               ).where(
+                    Attendance.user_id == user.id,
+                    func.date(Attendance.day) == func.date(datetime.now()),
+               )
+          ).first()
+          return attendance
      
 
 attendance_router = AttendanceRouter()

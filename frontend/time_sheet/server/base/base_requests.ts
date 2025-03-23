@@ -5,6 +5,7 @@ type getRequestsType = {
      token?:string;
      url:string;
      queryKey?:string;
+     isBlob?:boolean;
 }
 
 type postRequestsType = {
@@ -32,7 +33,8 @@ export function getRequests(
 {
      token,
      url,
-     queryKey = ""
+     queryKey = "",
+     isBlob = false
 }:getRequestsType
 ){
      const response = fetch(base_url + url + queryKey, {
@@ -42,10 +44,37 @@ export function getRequests(
                "Authorization": `Bearer ${token}`,
           }
      });
-     const data = response.then((res) => res.json());
+     
+     const data = response.then((res) => {
+          return isBlob ? res.blob() : res.json();
+     });
 
      return data;
 };
+
+export function getRequestsProms(
+     {
+          token,
+          url,
+          queryKey = "",
+          isBlob = false
+     }:getRequestsType
+     ){
+          const response = fetch(base_url + url + queryKey, {
+               method: "GET",
+               headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${token}`,
+               }
+          });
+          response.then((res) => {
+               if(res.ok){
+                    return res;
+               }
+               throw new Error(res.statusText);
+          });
+     };
+
 
 export async function postRequests(
 {

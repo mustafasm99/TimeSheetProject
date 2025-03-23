@@ -76,3 +76,7 @@ class BaseController(Generic[T]):
     async def read(self) -> list[T]:
         query = select(self.model)
         return list(self.session.exec(query).all())
+    
+    async def get_by_field(self, field:str, value:str) -> T:
+        query = select(self.model).where(getattr(self.model, field) == value)
+        return self.session.exec(query).first()

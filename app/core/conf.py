@@ -32,7 +32,7 @@ class Settings(BaseSettings):
     )
 
     MEDIA_PATH: str = "media"
-
+    DOMAIN: str
     @property
     def DATABASE_URL(self):
         if self.DATABASE_TYPE == DatabaseTypes.sqlite:

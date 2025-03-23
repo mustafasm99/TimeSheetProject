@@ -6,15 +6,29 @@ import { getRequests, putRequests } from "@/server/base/base_requests";
 import { FullTask } from "@/types/pages";
 import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
-import { incrementCounter, setTask, startCounting, stopeCounting , clearTask } from "@/app/redux/features/current-task";
+import {
+  incrementCounter,
+  setTask,
+  startCounting,
+  stopeCounting,
+  clearTask,
+} from "@/app/redux/features/current-task";
 import { formatTime } from "@/util/timer";
 import { useEffect, useRef } from "react";
-import { usePathname } from "next/navigation"
+import { usePathname } from "next/navigation";
 import { useAppContext } from "@/context";
-
-
+import { useRouter } from "next/navigation";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function ProfileHolder() {
+  const router = useRouter();
   const pathname = usePathname();
   const { token } = useAppContext();
   const { data, error, isLoading } = useQuery({
@@ -50,12 +64,16 @@ export default function ProfileHolder() {
       });
     },
     onMutate: ({ data }) => {
-      toast.success(`Task < ${data.task.title} > ${data.task.is_counting ? "starting" : "stopping"} successfully`);
+      toast.success(
+        `Task < ${data.task.title} > ${
+          data.task.is_counting ? "starting" : "stopping"
+        } successfully`
+      );
     },
   });
-  const { error:noCounter } =useQuery({
+  const { error: noCounter } = useQuery({
     queryKey: ["current_task"],
-    queryFn: async() => {
+    queryFn: async () => {
       const response = await getRequests({
         url: "task/current",
         token: token || "",
@@ -63,31 +81,31 @@ export default function ProfileHolder() {
       dispatch(setTask(response as FullTask));
       return response;
     },
-  })
-  if(noCounter && !pathname.includes("task")){
-   dispatch(clearTask());
+  });
+  if (noCounter && !pathname.includes("task")) {
+    dispatch(clearTask());
   }
   const currentTask = useAppSelector((state) => state.CurrentTaskReducer);
   let intervalRef = useRef<NodeJS.Timeout | null>(null);
   useEffect(() => {
-      if (currentTask.task.is_counting && !pathname.includes("task")) {
-        intervalRef.current = setInterval(() => {
-          dispatch(incrementCounter((prev) => prev + 1));
-        }, 1000);
-      } else {
-        if (intervalRef.current) {
-          clearInterval(intervalRef.current);
-          intervalRef.current = null;
-        }
+    if (currentTask.task.is_counting && !pathname.includes("task")) {
+      intervalRef.current = setInterval(() => {
+        dispatch(incrementCounter((prev) => prev + 1));
+      }, 1000);
+    } else {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
       }
-  
-      return () => {
-        if (intervalRef.current) {
-          clearInterval(intervalRef.current);
-          intervalRef.current = null;
-        }
-      };
-    }, [currentTask.task.is_counting, dispatch]);
+    }
+
+    return () => {
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
+    };
+  }, [currentTask.task.is_counting, dispatch]);
 
   return (
     <div className="container p-3 flex-grow bg-mainColor rounded-lg">
@@ -126,12 +144,10 @@ export default function ProfileHolder() {
                     <button
                       onClick={() => {
                         dispatch(stopeCounting());
-                        mutate(
-                          {
-                            task_id: currentTask.task.id,
-                            data: currentTask,
-                          }
-                        );
+                        mutate({
+                          task_id: currentTask.task.id as number,
+                          data: currentTask,
+                        });
                       }}
                       className="font-bold px-4 py-2 rounded-lg"
                     >
@@ -141,12 +157,10 @@ export default function ProfileHolder() {
                     <button
                       onClick={() => {
                         dispatch(startCounting());
-                        mutate(
-                          {
-                            task_id: currentTask.task.id,
-                            data: currentTask,
-                          }
-                        );
+                        mutate({
+                          task_id: currentTask.task.id as number,
+                          data: currentTask,
+                        });
                       }}
                       className="font-bold px-4 py-2 rounded-lg"
                     >
@@ -160,29 +174,51 @@ export default function ProfileHolder() {
             )}
           </div>
 
-          <button className="mx-4 my-2 ">
+          {/* <button className="mx-4 my-2 ">
             <Bell className="w-6 h-6 text-white" />
-          </button>
+          </button> */}
 
           {/* the image here  */}
           <div className="relative group">
-            <img
-              src={data.profile_image}
-              alt="profile image"
-              className="w-[50px] h-[50px] rounded-full content-center object-cover"
-            />
-            <div className="absolute -bottom-10 -left-10">
-              <ul className="bg-white text-mainColor p-5 rounded-lg hover:bg-mainColor hover:text-white border-2 border-blue-400 transition-all duration-300 ease-linear hidden group-hover:block">
-                <li>
-                  <button
-                    className="bg-transparent border-none"
-                    onClick={() => {}}
-                  >
-                    Logout
-                  </button>
-                </li>
-              </ul>
-            </div>
+            <DropdownMenu>
+              <DropdownMenuTrigger>
+                <img
+                  src={data.profile_image}
+                  alt="profile image"
+                  className="w-[50px] h-[50px] rounded-full content-center object-cover"
+                />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuLabel>
+                  {data.user.email}
+                </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem>
+                  <DropdownMenuLabel>
+                    <button
+                      onClick={()=>{
+                        router.push('/attendance')
+                      }}
+                    >
+                      My Attendance 
+                    </button>
+                  </DropdownMenuLabel>
+                </DropdownMenuItem>
+                <DropdownMenuItem>
+                  <DropdownMenuLabel>
+                    <button
+                      onClick={() => {
+                        localStorage.removeItem("token");
+                        localStorage.clear();
+                        window.location.reload();
+                      }}
+                    >
+                      Logout
+                    </button>
+                  </DropdownMenuLabel>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           </div>
         </div>
       )}

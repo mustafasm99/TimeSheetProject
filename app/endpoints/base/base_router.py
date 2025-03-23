@@ -107,3 +107,6 @@ class BaseRouter(Generic[_ModelType, _CreateType]):
         image_path = image_path.replace("\\","/")
         image_path = image_path.replace("media/","")
         return f"/static/{image_path}"
+    
+    def get_by_field(self , field:str , value:str):
+        return self.controller.get_by_field(field,value)

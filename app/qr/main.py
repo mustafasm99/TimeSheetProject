@@ -3,12 +3,14 @@ from io import BytesIO
 from pydantic import BaseModel
 from jose import jwt
 from datetime import datetime, timedelta
+from app.core.conf import settings
+
 
 class QrManager(BaseModel):
     token: str | None = None
     def create_token(self, user_id: int):
         self.token = jwt.encode(
-            {"sub": user_id, "exp": datetime.now() + timedelta(minutes=30)},
+            {"sub": str(user_id), "exp": datetime.now() + timedelta(minutes=30)},
             "secret-key-to-attendance",
             algorithm="HS256",
         )
@@ -25,7 +27,7 @@ class QrManager(BaseModel):
             box_size=10,
             border=4,
         )
-        qr.add_data(self.token)
+        qr.add_data(settings.DOMAIN+"/attendance/"+self.token)
         qr.make(fit=True)
         
         img = qr.make_image(fill_color="black", back_color="white")
@@ -38,3 +40,7 @@ class QrManager(BaseModel):
         img.save(img_bytes, format="PNG")
         img_bytes.seek(0)  # Reset buffer position
         return img_bytes
+    
+    def decode_token(self, token: str):
+        """Decode a token and return the payload"""
+        return jwt.decode(token, algorithms=["HS256"],key="secret-key-to-attendance")
