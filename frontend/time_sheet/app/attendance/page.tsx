@@ -7,6 +7,7 @@ import { Spinner } from "@heroui/spinner";
 import { Attendance } from "@/types/attendance";
 import { useState } from "react";
 import { set } from "date-fns";
+import { CircleCheck } from "lucide-react";
 
 
 
@@ -64,6 +65,16 @@ export default function Page() {
           <div className="flex flex-col">
               <img src={qrURL} alt="" />
           </div>
+      }
+      {
+        data && !showQR &&
+        <div className="flex flex-col gap-4 justify-center items-center">
+          <CircleCheck size={100} color="green" />
+          <h1 className="text-2xl font-bold text-green-500">
+          
+            Your attendance is already marked for today
+          </h1>
+        </div>
       }
     </div>
   );
