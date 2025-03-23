@@ -2,3 +2,12 @@ env/*
 env
 *.pyc
 .mypy_cache
+*.png
+*.jpg
+*.jpeg
+*.svg
+*.gif
+*.pdf
+*.mp4
+*.mov
+*.PNG
