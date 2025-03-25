@@ -93,7 +93,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
                   <div className="container search-holder w-full h-20 mx-5 rounded-md">
                     <div className="h-full relative">
                       {!isSearching && (
-                        <Search className="h-10 w-full absolute translate-y-1/2 -translate-x-20" />
+                        <Search className="h-10 w-fit absolute translate-y-1/2 -translate-x-20 left-1/2" />
                       )}
                       <Input
                         onInput={(e) => {

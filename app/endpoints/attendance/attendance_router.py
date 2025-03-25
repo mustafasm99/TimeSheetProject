@@ -45,6 +45,11 @@ class AttendanceRouter(BaseRouter[Attendance , CreateAttendance]):
                endpoint=self.today_attendance,
                methods=["GET"],
           )
+          self.router.add_api_route(
+               path="/me",
+               endpoint=self.get_me,
+               methods=["GET"],
+          )
           return super().setup_routes()
      
      
@@ -79,7 +84,7 @@ class AttendanceRouter(BaseRouter[Attendance , CreateAttendance]):
           return response
      
      async def attendance(self, token:str = Path(), user:User=Depends(authentication.get_current_user),):
-          try:
+          # try:
                old_attendance = await self.get_by_field("token", token)
                if old_attendance:
                     raise HTTPException(status_code=400, detail="Attendance already marked")
@@ -93,8 +98,8 @@ class AttendanceRouter(BaseRouter[Attendance , CreateAttendance]):
                )
                await super().create(attendance)
                return attendance
-          except:
-               raise HTTPException(status_code=400, detail="Invalid token")
+          # except:
+          #      raise HTTPException(status_code=400, detail="Invalid token")
      
      async def today_attendance(self, user:User=Depends(authentication.get_current_user))->Attendance|None:
           attendance = self.controller.session.exec(
@@ -105,6 +110,16 @@ class AttendanceRouter(BaseRouter[Attendance , CreateAttendance]):
                     func.date(Attendance.day) == func.date(datetime.now()),
                )
           ).first()
+          return attendance
+     
+     async def get_me(self, user:User=Depends(authentication.get_current_user))->list[Attendance|None]|None:
+          attendance = self.controller.session.exec(
+               select(
+                    Attendance
+               ).where(
+                    Attendance.user_id == user.id
+               )
+          ).all()
           return attendance
      
 
