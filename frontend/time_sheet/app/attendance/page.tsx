@@ -105,8 +105,8 @@ export default function Page() {
         ) : (
           qrURL &&
           showQR && (
-            <div className="flex flex-col">
-              <img src={qrURL} alt="" />
+            <div className="flex flex-col h-full w-full justify-center items-center">
+              <img src={qrURL} alt="" className="h-full" />
             </div>
           )
         )}

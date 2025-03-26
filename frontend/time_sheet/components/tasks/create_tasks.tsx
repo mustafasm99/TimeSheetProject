@@ -188,6 +188,7 @@ export default function CreateTaskForm() {
                 </SelectTrigger>
                 <SelectContent>
                     {projects?.map((project) => (
+                      project.id &&
                       <SelectItem key={project.id} value={project.id.toString() || ""}>
                         {project.name}
                       </SelectItem>

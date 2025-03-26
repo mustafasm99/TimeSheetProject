@@ -28,7 +28,7 @@ export default function Page() {
   let occupiedRows: Record<number, { start: Date; end: Date }> = {}
   if (isLoading) return <h1>Loading...</h1>;
   // console.log(data);
-  if (data) {
+  if (data && token) {
     return (
       <div className="w-full h-fit">
         <Calendar>
@@ -82,4 +82,9 @@ export default function Page() {
       </div>
     );
   }
+  else return <div className="w-screen h-screen flex justify-center items-center">
+    <h1 className="text-3xl">
+      Error unauthorized user
+    </h1>
+  </div>;
 }

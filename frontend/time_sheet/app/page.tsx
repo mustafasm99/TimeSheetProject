@@ -18,7 +18,6 @@ export default function Home() {
       </div>
     );
   }
-  console.log(user)
   return (
     <div className="flex flex-col gap-5  my-2 w-full">
         {
