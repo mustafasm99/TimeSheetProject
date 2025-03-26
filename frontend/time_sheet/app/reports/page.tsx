@@ -130,9 +130,9 @@ export default function Page() {
       <h1>Weekly Reports</h1>
       <ChartContainer
         config={chartConfig}
-        className="max-h-1/2 w-full border border-white"
+        className="max-h-1/2 w-full border border-white z-10"
       >
-        <BarChart data={chartData}>
+        <BarChart data={chartData} style={{ zIndex: 10 }}>
           <ChartTooltip content={chartToolTipCustomContent} />
           <CartesianGrid vertical={false} />
           <XAxis
@@ -146,7 +146,7 @@ export default function Page() {
             dataKey="attendance"
             fill="#2563eb"
             radius={[4, 4, 0, 0]}
-            className="max-w-[120px]"
+            className="max-w-[120px] z-10"
           />
         </BarChart>
       </ChartContainer>

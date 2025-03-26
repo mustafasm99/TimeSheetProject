@@ -9,7 +9,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import AppSidebar from "@/components/app-sidebar/app-sidebar";
 import { ThemeProvider } from "@/components/them-provider/theme-provider";
 import { Input } from "@/components/ui/input";
-import { Search } from "lucide-react";
+import { ExternalLink, Search } from "lucide-react";
 
 import { useState } from "react";
 import ProfileHolder from "@/components/profile-holder/profile-holder";
@@ -20,6 +20,11 @@ import CreateTaskForm, {
 import { Provider } from "react-redux";
 import { persistor, store } from "./redux/store";
 import { PersistGate } from "redux-persist/integration/react";
+import { getRequests } from "@/server/base/base_requests";
+import { Attendance } from "@/types/attendance";
+import { TaskType } from "@/types/states/tasks";
+
+import { useRouter } from "next/navigation";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -48,22 +53,20 @@ export default function RootLayout({
       >
         <Provider store={store}>
           <PersistGate loading={null} persistor={persistor}>
-          <ThemeProvider
-            attribute={"class"}
-            defaultTheme="system"
-            enableSystem
-            themes={["dark", "light"]}
-            disableTransitionOnChange={false}
-          >
-            {/* AppWrapper should wrap the entire layout */}
-            <AppWrapper>
-              <LayoutContent>
-                <main className="mx-5 my-2">
-                  {children}
-                </main>
-              </LayoutContent>
-            </AppWrapper>
-          </ThemeProvider>
+            <ThemeProvider
+              attribute={"class"}
+              defaultTheme="system"
+              enableSystem
+              themes={["dark", "light"]}
+              disableTransitionOnChange={false}
+            >
+              {/* AppWrapper should wrap the entire layout */}
+              <AppWrapper>
+                <LayoutContent>
+                  <main className="mx-5 my-2">{children}</main>
+                </LayoutContent>
+              </AppWrapper>
+            </ThemeProvider>
           </PersistGate>
         </Provider>
       </body>
@@ -75,6 +78,16 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
   const { token } = useAppContext(); // Now this works because AppWrapper wraps LayoutContent
   const [search, setSearch] = useState<string>("");
   const [isSearching, setIsSearching] = useState<boolean>(false);
+  const [tasks, setTasks] = useState<TaskType[]>([]);
+  const router = useRouter();
+  async function searchTasks() {
+    const response: TaskType[] = await getRequests({
+      url: "task/search?task_name=" + search,
+      token: token || "",
+    });
+    setTasks(response);
+    return response;
+  }
   return (
     // create the sidebar
 
@@ -99,6 +112,7 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
                         onInput={(e) => {
                           setSearch(e.currentTarget.value);
                           setIsSearching(true);
+                          searchTasks();
                         }}
                         placeholder="Search"
                         style={{
@@ -110,6 +124,42 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
                           fontSize: "1.5rem",
                         }}
                       />
+                      <div
+                        className="grid grid-cols-5 text-center w-full h-96 border border-white rounded-md bg-white overflow-y-auto"
+                        onMouseLeave={() => {
+                          setIsSearching(false);
+                        }}
+                        style={{
+                          display: isSearching ? "block" : "none",
+                          zIndex: 100,
+                        }}
+                      >
+                        <div className="grid grid-cols-5 text-center text-black w-full p-2 border-b border-black">
+                          <h1>Task Name</h1>
+                          <h1>Create Time</h1>
+                          <h1>Start Time</h1>
+                          <h1>End Time</h1>
+                        </div>
+
+                        {tasks.map((task) => (
+                          <div
+                            key={task.id}
+                            className="grid grid-cols-5 text-center text-black justify-between items-center p-2 border-b border-black"
+                          >
+                            <h1>{task.title}</h1>
+                            <h1>{task.create_time}</h1>
+                            <h1>{task.start_time}</h1>
+                            <h2>{task.end_time}</h2>
+                            <button
+                              onClick={() => {
+                                router.push("/task/" + task.id);
+                              }}
+                            >
+                              <ExternalLink />
+                            </button>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   </div>
                   <div className="container w-4/12">

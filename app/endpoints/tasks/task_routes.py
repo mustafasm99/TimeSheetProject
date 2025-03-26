@@ -4,13 +4,12 @@ from app.models.task.task_model import Task, TaskAssignee
 from app.endpoints.base.base_router import BaseRouter
 from .task_assignee_router import task_assignee_router, CreateTaskAssignee
 from pydantic import BaseModel
-from fastapi import Body, HTTPException
+from fastapi import Body, HTTPException , Query
 import logging
 from app.controller.auth import authentication
 from fastapi import Depends
 from datetime import datetime
 from sqlmodel import select
-
 
 class CreateTask(BaseModel):
     title: str
@@ -51,6 +50,12 @@ class TaskRouter(BaseRouter[Task, CreateTask]):
             path="/current",
             endpoint=self.get_current_task,
             response_model=FullTask,
+        )
+        self.router.add_api_route(
+            methods=["Get"],
+            path="/search",
+            endpoint=self.search_task,
+            response_model=list[Task],
         )
         super().setup_routes()
 
@@ -171,6 +176,12 @@ class TaskRouter(BaseRouter[Task, CreateTask]):
             if current_task.task_assign
             else None,
         )
+    
+    async def search_task(self , task_name:str = Query(...))->list[Task]:
+        tasks = self.controller.session.exec(
+            select(Task).where(Task.title.like(f"%{task_name}%"))
+        ).all()
+        return tasks
 
 
 task_router = TaskRouter()

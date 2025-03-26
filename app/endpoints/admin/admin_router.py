@@ -104,7 +104,7 @@ class AdminRouter(BaseRouter[Project, Project]):
     
     async def get_employee_reports(self)->list[WeeklyReports|None]|None:
         employees = self.controller.session.exec(
-            select(User).where(User.is_superuser == False)
+            select(User)
         ).all()
         reports = []
         for employee in employees:
