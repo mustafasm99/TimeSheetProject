@@ -67,7 +67,7 @@ export default function Page() {
               <p className="font-bold">Time Out</p>
             </div>
 
-            {myAttendanceData.map((attendance) => (
+            {myAttendanceData.length > 0 && myAttendanceData.map((attendance) => (
               <div className="grid grid-cols-3 text-center" key={attendance.id}>
                 <p className="border px-4 py-2">
                   {new Date(attendance.day).toDateString()}

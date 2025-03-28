@@ -43,7 +43,7 @@ export default function TaskLists(
                                         </h1>
                                    </div>
                                    <div 
-                                        className={` w-[20px] h-[20px] flex flex-row items-center justify-center rounded-full ${task.task_status.status.toLowerCase() === "done" ? "bg-green-500" :"bg-gray-500"} text-white`}
+                                        className={` w-[20px] h-[20px] flex flex-row items-center z-1 justify-center rounded-full ${task.task_status.status.toLowerCase() === "done" ? "bg-green-500" :"bg-gray-500"} text-white`}
                                    >
                                         <Check size={15}  color="black"/>
                                    </div>
