@@ -1,7 +1,7 @@
 import { GetMyProfile } from "@/server/profile/get_me";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { useAppSelector } from "@/app/redux/store";
-import { Bell, PlayCircle, StopCircle } from "lucide-react";
+import { Bell, Link2, PlayCircle, StopCircle } from "lucide-react";
 import { getRequests, putRequests } from "@/server/base/base_requests";
 import { FullTask } from "@/types/pages";
 import toast from "react-hot-toast";
@@ -134,9 +134,21 @@ export default function ProfileHolder() {
         <div className="flex flex-row justify">
           <div className="text-bold text-center text-white flex flex-col flex-1 w-fit gap-1 justify-start items-start">
             {currentTask.task.id !== 0 ? (
-              <div className="flex flex-col gap-1 w-fit justify-start items-start">
-                <p>{currentTask.task.title}</p>
-                <div className="flex flex-row gap-2 justify-start items-center">
+              <div className="flex flex-col gap-1 w-fit justify-start items-start border border-white rounded-lg p-2 bg-gray-900 px-4 py-2">
+                <div className="flex flex-row items-center justify-between w-full">
+                  <h1 className="text-white font-bold text-lg">
+                    {currentTask.task.title}
+                  </h1>
+                  <button 
+                    onClick={() => {
+                      router.push("/task/" + currentTask.task.id);
+                    }}
+                    className="flex flex-row justify-center items-center"
+                  >
+                    <Link2 className="h-5 w-5 text-white ml-2" />
+                  </button>
+                </div>
+                <div className="flex flex-row justify-between w-full items-center">
                   <p className="font-bold text-white bg-green-950 px-1  rounded-lg">
                     {formatTime(currentTask.currentCounter)}
                   </p>
@@ -149,9 +161,10 @@ export default function ProfileHolder() {
                           data: currentTask,
                         });
                       }}
-                      className="font-bold px-4 py-2 rounded-lg"
+                      className="font-bold rounded-lg"
                     >
-                      <PlayCircle className="h-5 w-5" />
+                      <StopCircle className="h-5 w-5" />
+                      
                     </button>
                   ) : (
                     <button
@@ -162,9 +175,9 @@ export default function ProfileHolder() {
                           data: currentTask,
                         });
                       }}
-                      className="font-bold px-4 py-2 rounded-lg"
+                      className="font-bold  rounded-lg"
                     >
-                      <StopCircle className="h-5 w-5" />
+                      <PlayCircle className="h-5 w-5" />
                     </button>
                   )}
                 </div>

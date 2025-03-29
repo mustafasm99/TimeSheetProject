@@ -125,13 +125,12 @@ function LayoutContent({ children }: { children: React.ReactNode }) {
                         }}
                       />
                       <div
-                        className="grid grid-cols-5 text-center w-full h-96 border border-white rounded-md bg-white overflow-y-auto"
+                        className="grid grid-cols-5 text-center w-full h-96 border border-white rounded-md bg-white overflow-y-auto z-50 relative"
                         onMouseLeave={() => {
                           setIsSearching(false);
                         }}
                         style={{
                           display: isSearching ? "block" : "none",
-                          zIndex: 100,
                         }}
                       >
                         <div className="grid grid-cols-5 text-center text-black w-full p-2 border-b border-black">

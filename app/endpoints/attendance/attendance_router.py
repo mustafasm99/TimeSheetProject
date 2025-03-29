@@ -96,8 +96,8 @@ class AttendanceRouter(BaseRouter[Attendance , CreateAttendance]):
                     user_id = user.id,
                     token = token
                )
-               await super().create(attendance)
-               return attendance
+               newAttendance =  await super().create(attendance)
+               return newAttendance
           # except:
           #      raise HTTPException(status_code=400, detail="Invalid token")
      
