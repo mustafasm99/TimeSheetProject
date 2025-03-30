@@ -223,7 +223,7 @@ export default function ProfileHolder() {
                       onClick={() => {
                         localStorage.removeItem("token");
                         localStorage.clear();
-                        window.location.reload();
+                        router.push("/");
                       }}
                     >
                       Logout

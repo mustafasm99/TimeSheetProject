@@ -70,7 +70,7 @@ export default function TeamsManagement() {
   
   if(adminData)
   return (
-    <div className="min-w-[420px] h-fit p-5 bg-[#aaaaaa] rounded-xl">
+    <div className="min-w-fit h-fit p-5 bg-[#aaaaaa] rounded-xl">
       <div className="flex flex-row w-full justify-start items-start gap-2 text-white p-2 rounded-md">
         <form
           onSubmit={handle_submit}
@@ -154,9 +154,9 @@ export default function TeamsManagement() {
                     <Badge>{team.team_leader.name}</Badge>
                   </div>
 
-                  <ScrollArea className="flex flex-col gap-2 w-full">
+                  <ScrollArea className="flex flex-col gap-4 w-full max-h-[220px] overflow-auto">
                     {team.team_members.map((member) => (
-                      <div key={member.id} className="flex flex-row gap-2">
+                      <div key={member.id} className="flex flex-row gap-2 my-2">
                         <Badge>{member.email}</Badge>{" "}
                         <X className="cursor-pointer" />
                       </div>

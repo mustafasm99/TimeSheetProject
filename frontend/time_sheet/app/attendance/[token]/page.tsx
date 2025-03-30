@@ -3,8 +3,8 @@
 import { useAppContext } from "@/context";
 import { useParams, usePathname } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { getRequests, getRequestsProms } from "@/server/base/base_requests";
-import { CheckCheck, CircleCheckBig, ShieldAlert } from "lucide-react";
+import { getRequests } from "@/server/base/base_requests";
+import { CircleCheckBig, ShieldAlert } from "lucide-react";
 
 export default function Page() {
   const { token } = useAppContext();
@@ -13,16 +13,14 @@ export default function Page() {
   const pathname = usePathname();
   const { data, isLoading, isError } = useQuery({
     queryKey: ["attendance", token],
-    queryFn: () => {
-      const response = getRequestsProms({
+    queryFn: async () => {
+      const response = await getRequests({
         url: "attendance/read-token/" + QrToken,
         token: token || "",
       });
       return response;
     },
   });
-
-  console.log(data, "data for attendance");
 
   return data ? (
     <div className="w-full h-screen flex flex-col gap-4 justify-center items-center">

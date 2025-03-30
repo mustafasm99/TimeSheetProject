@@ -194,7 +194,7 @@ export default function Page() {
               }}
             >
               <SelectTrigger className="bg-transparent border-none text-white">
-                <SelectValue placeholder={loadingStatus?"loading ...":data.task_status.status } />
+                <SelectValue placeholder={loadingStatus?"loading ...":data.task_status && data.task_status.status } />
               </SelectTrigger>
               <SelectContent>
                 <SelectGroup>

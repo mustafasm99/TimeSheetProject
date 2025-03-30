@@ -145,7 +145,7 @@ export default function ProjectsTools() {
               <SelectGroup>
                 {adminData.users
                   .filter((user) =>
-                    user.name.toLowerCase().includes(searchUser.toLowerCase())
+                    user.name?.toLowerCase().includes(searchUser.toLowerCase())
                   )
                   .map((user) => (
                     <SelectItem key={user.id === undefined ? uuidv4() : user.id} value={user.id === undefined ? "" : user.id.toString()}>

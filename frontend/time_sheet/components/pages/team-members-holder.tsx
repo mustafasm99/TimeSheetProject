@@ -11,7 +11,7 @@ export default function TeamMembersHolder({
 }: TeamMembersHolderType) {
   return (
     <div className="flex flex-row gap-0 items-start justify-start ">
-      {team_members.length < showMembers
+      {team_members.length < showMembers && team_members.length > 0
         ? team_members.map((member, index) => (
             <div
               key={index}

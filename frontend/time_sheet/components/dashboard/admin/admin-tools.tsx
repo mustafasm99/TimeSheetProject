@@ -52,13 +52,13 @@ export default function AdminTools() {
     return <div>Loading...</div>
   }
   return (
-    <Box className="w-full">
+    <Box className="w-full mx-auto my-2">
       <Masonry
-        className="px-0 py-1"
-        columns = {3}
-        spacing={4}
+        className="px-5 py-1"
+        columns = {4}
+        spacing={2}
         defaultHeight={250}
-        defaultColumns={3}
+        defaultColumns={4}
         sequential
       >
         <TeamsManagement />
