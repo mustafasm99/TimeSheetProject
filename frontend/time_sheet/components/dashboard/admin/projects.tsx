@@ -40,7 +40,7 @@ export default function ProjectsTools() {
  
   const dispatch = useDispatch();
   const adminData = useAppSelector((state) => state.AdminStore);
-  console.log(adminData , "from projects tools");
+  
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [searchUser, setSearchUser] = useState<string>("");
   const [searchStatus, setSearchStatus] = useState<string>("");

@@ -25,8 +25,8 @@ import { UserType } from "@/types/user";
 
 const UserSchema = z.object({
      name: z.string().max(100 , "max length for the name is : 100").min(3 , "min length for the name is : 3"),
-     email: z.string().email(),
-     password: z.string().min(8),
+     email: z.string().email(), /// @ .com
+     password: z.string().min(8 , "min length for the password is : 8"),
      is_superuser: z.boolean(),
      team_id: z.number(),
      is_temp_password: z.boolean(),
