@@ -42,12 +42,12 @@ export default function AppSidebar() {
           </div>
         )}
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="flex flex-col justify-between align-baseline text-center items-center gap-8">
         {state == "collapsed" ? (
           <SidebarGroup>
             <a
               href="/"
-              className={`block py-8 ${
+              className={`py-2 flex justify-center items-center ${
                 window.location.pathname === "/"
                   ? "bg-red-500 bg-gradient-to-l from-red-900 rounded-xl to-transparent bg-opacity-10 text-red-500"
                   : ""
@@ -61,7 +61,7 @@ export default function AppSidebar() {
               <>
                 <a
                   href="/employee"
-                  className={`block py-8 ${
+                  className={`py-2 flex justify-center items-center ${
                     window.location.pathname === "/employee"
                       ? "bg-red-500 bg-gradient-to-l from-red-900 rounded-xl to-transparent bg-opacity-10 text-red-500"
                       : ""
@@ -73,7 +73,7 @@ export default function AppSidebar() {
                 </a>
                 <a
                   href="/reports"
-                  className={`block py-8 ${
+                  className={`py-2 flex justify-center items-center ${
                     window.location.pathname === "/reports"
                       ? "bg-red-500 bg-gradient-to-l from-red-900 rounded-xl to-transparent bg-opacity-10 text-red-500"
                       : ""
@@ -86,9 +86,9 @@ export default function AppSidebar() {
               </>
             )}
             <a
-              href="/time_sheet"
-              className={`block py-8 ${
-                window.location.pathname === "/time_sheet"
+              href="/my-task"
+              className={`py-2 flex justify-center items-center ${
+                window.location.pathname === "/my-task"
                   ? "bg-red-500 bg-gradient-to-l from-red-900 rounded-xl to-transparent bg-opacity-10 text-red-500"
                   : ""
               }`}
@@ -98,9 +98,9 @@ export default function AppSidebar() {
               </div>
             </a>
             <a
-              href="/time_sheet/submit"
-              className={`block py-8 ${
-                window.location.pathname === "/time_sheet/submit"
+              href="/projects"
+              className={`py-2 flex justify-center items-center ${
+                window.location.pathname === "/projects"
                   ? "bg-red-500 bg-gradient-to-l from-red-900 rounded-xl to-transparent bg-opacity-10 text-red-500"
                   : ""
               }`}
@@ -111,7 +111,7 @@ export default function AppSidebar() {
             </a>
             <a
               href=""
-              className={`block py-8 ${
+              className={`py-2 flex justify-center items-center ${
                 window.location.pathname === ""
                   ? "bg-red-500 bg-gradient-to-l from-red-900 rounded-xl to-transparent bg-opacity-10 text-red-500"
                   : ""
@@ -122,9 +122,9 @@ export default function AppSidebar() {
               </div>
             </a>
             <a
-              href="/time_sheet/submit"
-              className={`block py-8 ${
-                window.location.pathname === "/time_sheet/submit"
+              href="/calendar"
+              className={`py-2 flex justify-center items-center ${
+                window.location.pathname === "/calendar"
                   ? "bg-red-500 bg-gradient-to-l from-red-900 rounded-xl to-transparent bg-opacity-10 text-red-500"
                   : ""
               }`}
