@@ -51,7 +51,7 @@ export default function ProfileHolder() {
         token: token || "",
         data: data
           ? {
-              is_counting: data.task.is_counting,
+              is_counting: !data.task.is_counting,
               title: data.task.title,
               description: data.task.description,
               start_time: data.task.start_time,
