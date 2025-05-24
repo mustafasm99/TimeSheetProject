@@ -52,10 +52,10 @@ export default function AdminTools() {
     return <div>Loading...</div>
   }
   return (
-    <Box className="w-full mx-auto my-2">
+    <Box className="max-w-[90vw] mx-auto my-2">
       <Masonry
-        className="px-5 py-1"
-        columns = {4}
+        className="px-5 py-1 max-w-[90vw]"
+        columns = {3}
         spacing={2}
         defaultHeight={250}
         defaultColumns={4}
