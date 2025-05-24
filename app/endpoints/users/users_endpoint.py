@@ -139,7 +139,8 @@ class UserRouter(BaseRouter[User, CreateUser]):
                 image=self.get_image_url(result.profile.profile_image) if result.profile else None,
                 create_time=result.create_time,
                 update_time=result.update_time,
-                password=result.password
+                password=result.password,
+                have_profile= False,
             )
         except Exception as e:
             logging.error(f"Error in create user: {e}")

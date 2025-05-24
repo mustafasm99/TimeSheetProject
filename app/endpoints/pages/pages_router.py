@@ -172,8 +172,8 @@ class PagesRouter(BaseRouter[Project, CreateProject]):
                                     user=member.user,
                                     profile=member.user.profile,
                                     image_url=self.get_image_url(
-                                        member.user.profile.profile_image
-                                    ),
+                                        member.user.profile.profile_image 
+                                    )if member.user.profile and member.user.profile.profile_image else None,
                                 )
                                 for member in project.team.team_members
                             ],
@@ -201,7 +201,7 @@ class PagesRouter(BaseRouter[Project, CreateProject]):
                     FullUser(
                         user=member.user,
                         profile=member.user.profile,
-                        image_url=self.get_image_url(member.user.profile.profile_image),
+                        image_url=self.get_image_url(member.user.profile.profile_image) if member.user.profile and member.user.profile.profile_image else None,
                     )
                     for member in project.team.team_members
                 ],
