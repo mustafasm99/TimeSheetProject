@@ -64,7 +64,7 @@ export default function Page() {
             <div className="grid grid-cols-3  bg-gray-200 p-2 text-black text-center">
               <p className="font-bold">Date</p>
               <p className="font-bold">Time In</p>
-              <p className="font-bold">Time Out</p>
+              <p className="font-bold">Coder</p>
             </div>
 
             {myAttendanceData.length > 0 && myAttendanceData.map((attendance) => (
