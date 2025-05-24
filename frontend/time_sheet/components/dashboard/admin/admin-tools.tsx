@@ -62,8 +62,8 @@ export default function AdminTools() {
         sequential
       >
         <TeamsManagement />
-        <ProjectsTools />
         <UserManager />
+        <ProjectsTools />
         <UserViewer />
         <TaskStatusManager />
       </Masonry>
