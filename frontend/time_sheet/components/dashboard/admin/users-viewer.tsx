@@ -17,7 +17,7 @@ export default function UserViewer() {
       <h1 className="text-black text-lg font-semibold w-full px-2 py-2">
         All Users
       </h1>
-      <ScrollArea className="w-full  overflow-y-auto">
+      <ScrollArea className="w-full px-1  overflow-y-auto">
         {adminData.users.map((user) => {
           return (
             <div
@@ -30,7 +30,7 @@ export default function UserViewer() {
                     <img
                       src={config().API_URL + user.image}
                       alt="user"
-                      className="w-10 h-10 rounded-full"
+                      className="w-10 h-10 rounded-full object-cover"
                     />
                   ) : (
                     <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
