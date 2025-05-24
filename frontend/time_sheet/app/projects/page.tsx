@@ -22,11 +22,11 @@ export default function Projects(){
                          url:"pages/user_projects",
                          token:token|| "",
                     })
+
                     return response as projectsResponse[];
                }
           }
      )
-     console.log(data , "Pages projects");
     if (isLoading){
            return (
                  <div

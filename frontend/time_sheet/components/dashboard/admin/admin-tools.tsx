@@ -52,11 +52,11 @@ export default function AdminTools() {
     return <div>Loading...</div>
   }
   return (
-    <Box className="max-w-[90vw] mx-auto my-2">
+    <Box className="w-full mx-auto my-2">
       <Masonry
-        className="px-5 py-1 w-[90vw]"
-        columns = {3}
-        spacing={1}
+        className="px-5 py-1 w-full max-w-[90vw]"
+        columns = {4}
+        spacing={2}
         defaultHeight={250}
         defaultColumns={3}
         sequential
