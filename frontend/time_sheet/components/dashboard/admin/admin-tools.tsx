@@ -54,11 +54,11 @@ export default function AdminTools() {
   return (
     <Box className="max-w-[90vw] mx-auto my-2">
       <Masonry
-        className="px-5 py-1 max-w-[90vw]"
+        className="px-5 py-1 w-[90vw]"
         columns = {3}
-        spacing={2}
+        spacing={1}
         defaultHeight={250}
-        defaultColumns={4}
+        defaultColumns={3}
         sequential
       >
         <TeamsManagement />
